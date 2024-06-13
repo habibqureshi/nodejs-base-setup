@@ -1,0 +1,224 @@
+steps:
+  #Restring Cache
+  # # - name: "gcr.io/cloud-builders/gsutil"
+  # #   entrypoint: sh
+  # #   id: restore_cache
+  # #   args:
+  # #     [
+  # #       "-c",
+  # #       "gsutil cp gs://${PROJECT_ID}_cloudbuild/maven-$(cksum pom.xml | cut -d' ' -f1 | tr ' ' -).tgz cache.tgz || exit 0 && tar -xzf cache.tgz -C /root/.m2",
+  # #     ]
+  # #   volumes:
+  # #     - name: m2_cache
+  # #       path: "/root/.m2"
+  # - name: gcr.io/$PROJECT_ID/restore_cache
+  #   id: restore_cache
+  #   args:
+  #     [
+  #       "-b=gs://${PROJECT_ID}_cloudbuild",
+  #       "-k=npm-rbas-$(checksum package.json)-$(checksum package-lock.json)",
+  #       "-kf=maven-",
+  #     ]
+  #   volumes:
+  #     - path: /root/.m2
+  #       name: m2_cache
+
+  # #Compiling with maven
+  # - name: maven:3.6.3-jdk-8-slim
+  #   entrypoint: mvn
+  #   id: "Compiling"
+  #   args: ["clean", "install", "-Plive", "-DskipTests"]
+  #   env:
+  #     - MAVEN_OPTS=-Dmaven.repo.local=/root/.m2
+  #   waitFor:
+  #     - restore_cache
+  #   volumes:
+  #     - name: m2_cache
+  #       path: "/root/.m2"
+
+  # #Saving cache
+  # # - name: "gcr.io/cloud-builders/gsutil"
+  # #   entrypoint: sh
+  # #   id: save_cache
+  # #   args:
+  # #     [
+  # #       "-c",
+  # #       "cd /root/.m2 && tar -czf cache.tgz * && gsutil cp cache.tgz gs://${PROJECT_ID}_cloudbuild/maven-$(cd /workspace && cksum pom.xml | cut -d' ' -f1 | tr ' ' -).tgz",
+  # #     ]
+  # #   volumes:
+  # #     - name: m2_cache
+  # #       path: "/root/.m2"
+  # - name: gcr.io/$PROJECT_ID/save_cache
+  #   args:
+  #     [
+  #       "-b=gs://${PROJECT_ID}_cloudbuild",
+  #       "-k=npm-rbas-$(checksum package.json)-$(checksum package-lock.json)",
+  #       "-p=/root/.m2",
+  #       "-n",
+  #     ]
+  #   volumes:
+  #     - name: m2_cache
+  #       path: /root/.m2
+
+  #Pulling latest image
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    id: latest_container
+    args: ["-c", "docker pull ${_IMAGE_NAME} || exit 0"]
+
+  #Building docker image
+  - name: gcr.io/cloud-builders/docker
+    id: "Building container"
+    args:
+      ["build", "-t", "${_IMAGE_NAME}", "--cache-from", "${_IMAGE_NAME}", "."]
+    waitFor:
+      - Compiling
+      - latest_container
+  - name: gcr.io/cloud-builders/docker
+    id: publishing
+    args: [push, "${_IMAGE_NAME}"]
+
+  - name: gcr.io/cloud-builders/gcloud
+    # entrypoint: bash
+    id: allow_ip
+    # args: [allow-ip-gke.sh]
+    script: |
+      #!/bin/bash
+      CONFIG_LOC=~/config.json
+      UPDATE_CONFIG_LOC=~/updateConfig.json 
+      CLOUD_BUILD_IP=$(curl -s ifconfig.me)
+      DISPLAY_NAME=Cloudbuild-$BUILD_ID
+
+      apt-get update && apt-get install -y jq curl
+
+      gcloud container clusters describe $CLOUDSDK_CONTAINER_CLUSTER --zone $CLOUDSDK_COMPUTE_ZONE --project $PROJECT_ID --format "json(masterAuthorizedNetworksConfig.cidrBlocks)" > $CONFIG_LOC
+      if [ $? -ne 0 ]; then
+          echo "Failed to fetch master authorized config"
+          exit 1
+      fi
+      echo "Fetched master authorized config"
+
+      jq '.update.desiredMasterAuthorizedNetworksConfig = .masterAuthorizedNetworksConfig | 
+          del(.masterAuthorizedNetworksConfig) | 
+          .update.desiredMasterAuthorizedNetworksConfig.enabled = true |
+          .update.desiredMasterAuthorizedNetworksConfig.cidrBlocks += [{
+              "cidrBlock": "'$CLOUD_BUILD_IP'/32",
+              "displayName": "'$DISPLAY_NAME'"
+          }]' $CONFIG_LOC > $UPDATE_CONFIG_LOC
+      if [ $? -ne 0 ]; then
+          echo "Failed to modify network configuration"
+          exit 1
+      fi
+      echo "network configuration updated successfully"
+
+      ACCESS_TOKEN=$(gcloud auth print-access-token)
+      if [ -z "$ACCESS_TOKEN" ]; then
+          echo "Failed to get access token."
+          exit 1
+      fi
+      echo "Access token generated"
+
+      curl -X PUT \
+          -H "Authorization: Bearer $ACCESS_TOKEN" \
+          -H "Content-Type: application/json" \
+          -H "Accept: application/json" \
+          --data @"$UPDATE_CONFIG_LOC" \
+          "https://container.googleapis.com/v1beta1/projects/$PROJECT_ID/locations/$CLOUDSDK_COMPUTE_ZONE/clusters/$CLOUDSDK_CONTAINER_CLUSTER"
+      if [ $? -ne 0 ]; then
+          echo "Failed to update cluster configuration."
+          exit 1
+      fi
+      echo "Cluster configuration updated successfully."
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=${_CLUSTER_ZONE}"
+      - "CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "BUILD_ID=${BUILD_ID}"
+
+  #Perform rolling update
+  - name: gcr.io/cloud-builders/kubectl
+    # entrypoint: bash
+    id: rolling_update
+    # args: [kube-rolling-update.sh]
+    script: |
+      #!/bin/bash
+      gcloud container clusters get-credentials $CLOUDSDK_CONTAINER_CLUSTER --zone $CLOUDSDK_COMPUTE_ZONE --project $PROJECT_ID
+      if [ $? -ne 0 ]; then
+          echo "Failed to get cluster credentials"
+          exit 1
+      fi
+      echo "cluster credentials fetched"
+
+      #kubectl rollout restart deployment $DEPLOYMENT_NAME -n $WORKLOAD_NS
+      kubectl get po -n $WORKLOAD_NS
+      if [ $? -ne 0 ]; then
+          echo "Failed to get cluster credentials"
+          exit 1
+      fi
+      echo "Rolling update performed"
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=${_CLUSTER_ZONE}"
+      - "CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}"
+      - "DEPLOYMENT_NAME=${_DEPLOYMENT_NAME}"
+      - "WORKLOAD_NS=${_WORKLOAD_NS}"
+      - "PROJECT_ID=${PROJECT_ID}"
+    waitFor:
+      - allow_ip
+      - publishing
+
+  - name: gcr.io/cloud-builders/gcloud
+    # entrypoint: bash
+    id: remove_ip
+    # args: [remove-ip-gke.sh]
+    script: |
+      #!/bin/bash
+      CONFIG_LOC=~/config.json
+      UPDATE_CONFIG_LOC=~/updateConfig.json 
+      DISPLAY_NAME=Cloudbuild-$BUILD_ID
+
+      apt-get update && apt-get install -y jq curl
+
+      gcloud container clusters describe $CLOUDSDK_CONTAINER_CLUSTER --zone $CLOUDSDK_COMPUTE_ZONE --project $PROJECT_ID --format "json(masterAuthorizedNetworksConfig.cidrBlocks)" > $CONFIG_LOC
+      if [ $? -ne 0 ]; then
+          echo "Failed to fetch master authorized config"
+          exit 1
+      fi
+      echo "Fetched master authorized config"
+
+      jq '.update.desiredMasterAuthorizedNetworksConfig = .masterAuthorizedNetworksConfig | 
+          del(.masterAuthorizedNetworksConfig) | 
+          .update.desiredMasterAuthorizedNetworksConfig.enabled = "true" |
+          del(.update.desiredMasterAuthorizedNetworksConfig.cidrBlocks[] | 
+          select(.displayName=="'$DISPLAY_NAME'"))' $CONFIG_LOC > $UPDATE_CONFIG_LOC
+      if [ $? -ne 0 ]; then
+          echo "Failed to modify network configuration"
+          exit 1
+      fi
+      echo "network configuration updated successfully"
+
+      ACCESS_TOKEN=$(gcloud auth print-access-token)
+      curl -X PUT \
+          -H "Authorization: Bearer $ACCESS_TOKEN" \
+          -H "Content-Type: application/json" \
+          -H "Accept: application/json" \
+          --data @"$UPDATE_CONFIG_LOC" \
+          "https://container.googleapis.com/v1beta1/projects/$PROJECT_ID/locations/$CLOUDSDK_COMPUTE_ZONE/clusters/$CLOUDSDK_CONTAINER_CLUSTER"
+      if [ $? -ne 0 ]; then
+          echo "Failed to update cluster configuration."
+          exit 1
+      fi
+      echo "Cluster configuration updated successfully."
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=${_CLUSTER_ZONE}"
+      - "CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "BUILD_ID=${BUILD_ID}"
+    waitFor:
+      - rolling_update
+
+substitutions:
+  _CLUSTER_ZONE: default
+  _CLUSTER_NAME: default
+  _DEPLOYMENT_NAME: default
+  _WORKLOAD_NS: default
+  _IMAGE_NAME: default

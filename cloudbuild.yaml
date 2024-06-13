@@ -72,7 +72,6 @@ steps:
     args:
       ["build", "-t", "${_IMAGE_NAME}", "--cache-from", "${_IMAGE_NAME}", "."]
     waitFor:
-      - Compiling
       - latest_container
   - name: gcr.io/cloud-builders/docker
     id: publishing

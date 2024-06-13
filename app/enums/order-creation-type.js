@@ -1,0 +1,9 @@
+module.exports = {
+  API: 'API',
+  ADMIN: 'ADMIN',
+  CLIENT_ADMIN: 'CLIENT_ADMIN',
+  ZID: 'ZID',
+  SALLA: 'SALLA',
+  MAGENTO: 'MAGENTO',
+  SHOPIFY: 'SHOPIFY',
+};

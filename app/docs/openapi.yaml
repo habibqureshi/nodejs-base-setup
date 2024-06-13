@@ -1,0 +1,1479 @@
+openapi: 3.0.0
+servers:
+  - description: Live API
+    url: 'https://be.bestone.ws'
+info:
+  title: API DOCS
+  license:
+    name: API DOCS
+  description: |
+    **Steps for Basic Auth:**   
+    1) first of all you need to have our  Dashboard username and password after that on this URL https://www.blitter.se/utils/basic-authentication-header-generator/ you can generate your basic Auth from it. 
+    2) Now you have to add Authorization headers.
+
+    **Timezone:**
+    1) Get the Timezone from this URL https://timezonedb.com/time-zones
+tags:
+  - name: Last Mile
+  - name: Fulfilment
+  - name: Cities
+  - name: Countries
+security:
+  - BasicAuth: []
+paths:
+  /api/create/order:
+    post:
+      tags:
+        - Last Mile
+      summary: Create Order
+      description: create order
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: '#/paths/~1api~1create~1order/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                      example: 1
+                    totalCreated:
+                      type: integer
+                      example: 1
+                    totalFailed:
+                      type: integer
+                      example: 0
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1create~1order/post/responses/200/content/application~1json/schema/orderrs'
+                orderrs:
+                  type: object
+                  required:
+                    - orders
+                    - orderNumber
+                    - orderTrackingNumber
+                    - status
+                    - msg
+                    - order
+                    - type
+                  properties:
+                    orderNumber:
+                      type: string
+                      example: 97260383
+                    orderTrackingNumber:
+                      type: string
+                      example: API0000036012
+                    status:
+                      type: string
+                      example: success
+                    msg:
+                      type: string
+                      example: Order Created
+                    order:
+                      type: string
+                      example: null
+                    type:
+                      type: string
+                      example: DROP_SHIP
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    description: |
+                      **Order Creation Failed Reasons:**
+                      1) Customer city not found with code/name riyadh
+                      2) Duplicate Reference no for client
+                      3) Maximum Allowed Pieces for Client 100
+                      4) Invalid customer name
+                      5) Invalid customer customer-Addresses areaName
+                      6) sender length should be between 1-50
+                      7) weight of order must be greater than zero
+                      8) Invalid customer mobile1
+                    example: Customer city not found with code/name riyadh
+                  httpStatus:
+                    type: string
+                    example: BAD_REQUEST
+                  data:
+                    type: string
+                    example: null
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orders:
+                  $ref: '#/paths/~1api~1create~1order/post/requestBody/content/application~1json/schema/orders'
+              orders:
+                type: array
+                items:
+                  $ref: '#/paths/~1api~1create~1order/post/requestBody/content/application~1json/schema/by'
+              by:
+                type: object
+                required:
+                  - referenceNumber
+                  - pieces
+                  - description
+                  - codAmount
+                  - paymentType
+                  - collectTax
+                  - clientComments
+                  - value
+                  - sender
+                  - weight
+                properties:
+                  referenceNumber:
+                    type: string
+                    example: BS-01
+                  pieces:
+                    type: integer
+                    example: 2
+                  description:
+                    type: string
+                    example: Samsung A51
+                  codAmount:
+                    type: integer
+                    example: 10
+                  paymentType:
+                    type: string
+                    example: COD
+                  clientComments:
+                    type: string
+                    example: Handle With Care
+                  value:
+                    type: number
+                    format: float
+                    description: if CC order then required else not
+                    example: 100
+                  senderInformation:
+                    $ref: '#/paths/~1api~1create~1order/post/requestBody/content/application~1json/schema/sender'
+                  customer:
+                    $ref: '#/paths/~1api~1create~1order/post/requestBody/content/application~1json/schema/admin'
+                  sender:
+                    type: string
+                    example: John
+                  weight:
+                    type: integer
+                    example: 5.2
+              sender:
+                type: object
+                required:
+                  - address
+                  - city
+                  - contactNumber
+                properties:
+                  address:
+                    type: string
+                    example: Sulay
+                  city:
+                    $ref: '#/paths/~1api~1create~1order/post/requestBody/content/application~1json/schema/city1'
+                  contactNumber:
+                    type: integer
+                    example: 966300788877
+              city1:
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    example: Jeddah
+              admin:
+                type: object
+                required:
+                  - name
+                  - customerAddresses
+                  - mobile1
+                properties:
+                  name:
+                    type: string
+                    example: David
+                  customerAddresses:
+                    $ref: '#/paths/~1api~1create~1order/post/requestBody/content/application~1json/schema/Caddress'
+                  mobile1:
+                    type: integer
+                    example: 9612398444
+              Caddress:
+                required:
+                  - address
+                  - areaName
+                properties:
+                  address:
+                    type: string
+                    example: 358 Riyadh Sulah
+                  areaName:
+                    type: string
+                    example: Riyadh
+                  city:
+                    $ref: '#/paths/~1api~1create~1order/post/requestBody/content/application~1json/schema/City'
+              City:
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    example: Riyadh
+        description: order creation
+  /api/fulfilment/order:
+    post:
+      tags:
+        - Fulfilment
+      summary: Create Fulfilment Order
+      description: Fulfilment Order
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: '#/paths/~1api~1fulfilment~1order/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                      example: 1
+                    totalCreated:
+                      type: integer
+                      example: 1
+                    totalFailed:
+                      type: integer
+                      example: 0
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1fulfilment~1order/post/responses/200/content/application~1json/schema/orderrs'
+                orderrs:
+                  type: object
+                  properties:
+                    orderNumber:
+                      type: string
+                      example: BS-01
+                    orderTrackingNumber:
+                      type: string
+                      example: FUL0000000001
+                    status:
+                      type: string
+                      example: CREATED
+                    msg:
+                      type: string
+                      example: Pending Fulfilment Order created
+                    order:
+                      type: string
+                      example: null
+                    type:
+                      type: string
+                      example: null
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Duplicate Reference Number For Client
+                  httpStatus:
+                    type: string
+                    example: BAD_REQUEST
+                  data:
+                    type: string
+                    example: null
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orders
+                - products
+                - mobile1
+                - city
+              properties:
+                orders:
+                  $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/orders'
+              orders:
+                type: array
+                items:
+                  $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/by'
+              by:
+                type: object
+                required:
+                  - referenceNumber
+                  - description
+                  - codAmount
+                  - paymentType
+                  - clientComments
+                  - value
+                  - weight
+                  - sender
+                properties:
+                  referenceNumber:
+                    type: string
+                    example: FUL-01
+                  description:
+                    type: string
+                    example: Samsung Ultra
+                  codAmount:
+                    type: integer
+                    example: 10
+                  paymentType:
+                    type: string
+                    example: CC
+                  clientComments:
+                    type: string
+                    example: Handle With Care
+                  value:
+                    type: integer
+                    example: 0
+                  senderInformation:
+                    $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/sender'
+                  weight:
+                    type: integer
+                    example: 1.3
+                  sender:
+                    type: string
+                    example: John
+                  customer:
+                    $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/admin'
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/products'
+              sender:
+                type: object
+                required:
+                  - address
+                  - city
+                  - contactNumber
+                properties:
+                  address:
+                    type: string
+                    example: Jeddah
+                  city:
+                    $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/city1'
+                  contactNumber:
+                    type: integer
+                    example: 966800123654
+              city1:
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    example: Riyadh
+              admin:
+                type: object
+                required:
+                  - name
+                  - customerAddresses
+                  - mobile1
+                properties:
+                  name:
+                    type: string
+                    example: David
+                  customerAddresses:
+                    $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/Caddress'
+                  mobile1:
+                    type: integer
+                    example: 966321456987
+              Caddress:
+                required:
+                  - address
+                  - areaName
+                properties:
+                  address:
+                    type: string
+                    example: 388 Riyadh Sulah
+                  areaName:
+                    type: string
+                    example: Riyadh Town
+                  city:
+                    $ref: '#/paths/~1api~1fulfilment~1order/post/requestBody/content/application~1json/schema/City'
+              City:
+                required:
+                  - name
+                properties:
+                  id:
+                    type: integer
+                    example: 48
+                  name:
+                    type: string
+                    example: Riyadh
+              products:
+                required:
+                  - id
+                  - quantity
+                properties:
+                  id:
+                    type: string
+                    example: SKU0000000001
+                  quantity:
+                    type: integer
+                    example: 1
+        description: Fulfilment Order
+  /api/product/:
+    post:
+      tags:
+        - Fulfilment
+      summary: Create Fulfilment Product
+      description: create Product in Fulfilment
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/paths/~1api~1product~1/post/responses/200/content/application~1json/schema/data1'
+                data1:
+                  properties:
+                    productNumber:
+                      type: string
+                      example: BS-01
+                    productTrackingSku:
+                      type: string
+                      example: SKU0000000001
+                    status:
+                      type: string
+                      example: success
+                    msg:
+                      type: string
+                      example: Product Created Successfully
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/paths/~1api~1product~1/post/responses/400/content/application~1json/schema/data'
+                data:
+                  properties:
+                    productNumber:
+                      type: string
+                      example: BS-01
+                    productTrackingSku:
+                      type: string
+                      example: null
+                    status:
+                      type: string
+                      example: fail
+                    msg:
+                      type: string
+                      example: Duplicate Reference Number For Client
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - client
+                - products
+                - data
+              properties:
+                products:
+                  $ref: '#/paths/~1api~1product~1/post/requestBody/content/application~1json/schema/products'
+              products:
+                type: array
+                items:
+                  $ref: '#/paths/~1api~1product~1/post/requestBody/content/application~1json/schema/by'
+              by:
+                type: object
+                required:
+                  - referenceSKU
+                  - brand
+                  - weight
+                  - height
+                  - length
+                  - width
+                  - description
+                  - image
+                  - isCompanyProduct
+                properties:
+                  referenceSKU:
+                    type: string
+                    example: SK-01
+                  brand:
+                    type: string
+                    example: Samsung
+                  weight:
+                    type: integer
+                    example: 1.3
+                  height:
+                    type: integer
+                    example: 10
+                  length:
+                    type: integer
+                    example: 100
+                  width:
+                    type: integer
+                    example: 5.5
+                  description:
+                    type: string
+                    example: New Edition Available
+                  image:
+                    type: string
+                    example: 'https://storage.googleapis.com/pic.jpg'
+                  isCompanyProduct:
+                    type: boolean
+                    example: true
+        description: Create Product
+  /api/get/payment/method:
+    post:
+      tags:
+        - Last Mile
+      summary: Payment Method
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      example: 'COD,CC'
+  /api/order/schedule:
+    post:
+      tags:
+        - Last Mile
+      summary: Order Schedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - customerComments
+              properties:
+                customer:
+                  $ref: '#/paths/~1api~1order~1schedule/post/requestBody/content/application~1json/schema/customer'
+                id:
+                  type: string
+                  example: API0000000001
+                customerComments:
+                  type: string
+                  example: Perfect
+              customer:
+                type: object
+                required:
+                  - customerAddresses
+                  - mobile1
+                properties:
+                  customerAddresses:
+                    $ref: '#/paths/~1api~1order~1schedule/post/requestBody/content/application~1json/schema/customerAddresses'
+                  mobile1:
+                    type: integer
+                    example: 966321456987
+              customerAddresses:
+                type: object
+                properties:
+                  city:
+                    $ref: '#/paths/~1api~1order~1schedule/post/requestBody/content/application~1json/schema/city'
+                  address:
+                    type: string
+                    example: Riyadh Town
+                  areaName:
+                    type: string
+                    example: Riyadh
+                  latitude:
+                    type: integer
+                    example: 31.4766839
+                  longitude:
+                    type: integer
+                    example: 74.2766072
+                  whatThreeWords:
+                    type: string
+                    example: riyadh
+              city:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: Riyadh
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: '#/paths/~1api~1order~1schedule/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                      example: 1
+                    totalCreated:
+                      type: integer
+                      example: 1
+                    totalFailed:
+                      type: integer
+                      example: 0
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1order~1schedule/post/responses/200/content/application~1json/schema/orders'
+                orders:
+                  type: object
+                  properties:
+                    orderNumber:
+                      type: string
+                      example: API-1
+                    orderTrackingNumber:
+                      type: string
+                      example: API0000000001
+                    status:
+                      type: string
+                      example: success
+                    msg:
+                      type: string
+                      example: order scheduled
+                    order:
+                      type: string
+                      example: null
+                    type:
+                      type: string
+                      example: DROP_SHIP
+  /api/get/awb:
+    post:
+      tags:
+        - Last Mile
+      summary: AWB
+      parameters:
+        - in: query
+          name: orderid
+          required: true
+          schema:
+            type: string
+            example: API0000178748
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  AWB:
+                    type: string
+                    example: AWB PDF DOWNLOAD
+  /api/order/check/statuses:
+    post:
+      tags:
+        - Last Mile
+      summary: Check Order Status
+      parameters:
+        - in: query
+          name: timezone
+          description: 'Get the Timezone from this URL https://timezonedb.com/time-zones'
+          required: true
+          schema:
+            type: string
+            example: Asia/Riyadh
+        - in: query
+          name: size
+          description: 'if size is not defined by default is 10, we have these sizes available 10,20,50 and 100'
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - in: query
+          name: status
+          description: If status not defined it would be by defaulf created
+          required: false
+          schema:
+            type: string
+            example: CREATED
+        - in: query
+          name: from
+          required: true
+          schema:
+            type: string
+            example: 2022-03-1
+        - in: query
+          name: to
+          required: true
+          schema:
+            type: string
+            example: 2022-04-1
+        - in: query
+          name: id
+          required: false
+          description: this is only required with next=next for pagination and sequence matters id=last id of order without API code  then next=next
+          schema:
+            type: string
+            example: 14611
+        - in: query
+          name: next
+          description: if we need to go to next page of orders this is required
+          required: false
+          schema:
+            type: string
+            example: next
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  description: Multiple tracking Numbers can be used for checking order statuses
+                  type: string
+                  example: 'API000000002,API000000001'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: '#/paths/~1api~1order~1check~1statuses/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      example: 2
+                    total:
+                      type: integer
+                      example: 2
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1order~1check~1statuses/post/responses/200/content/application~1json/schema/orders'
+                    id:
+                      type: string
+                      example: API000000002
+                    events:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1order~1check~1statuses/post/responses/200/content/application~1json/schema/events2'
+                orders:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: API0000000001
+                    events:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1order~1check~1statuses/post/responses/200/content/application~1json/schema/events'
+                events:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: CREATED
+                    createdAt:
+                      type: integer
+                      example: '2022-04-02T09:42:10.000+0000'
+                events2:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: PICKED
+                    createdAt:
+                      type: integer
+                      example: '2022-04-02T09:42:10.000+0000'
+  /api/get/all/cities:
+    post:
+      tags:
+        - Cities
+      summary: Get Cities
+      description: Get Cities
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/paths/~1api~1get~1all~1cities/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 48
+                    name:
+                      type: string
+                      example: Riyadh
+                    code:
+                      type: string
+                      example: RUH
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Country not found in database
+                  httpStatus:
+                    type: string
+                    example: BAD_REQUEST
+                  data:
+                    type: string
+                    example: null
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  description: Country ID
+                  example: 39
+        description: Get All Cities
+  /api/get/all/countries:
+    post:
+      tags:
+        - Countries
+      summary: Get All Countries
+      description: Get Countries
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/paths/~1api~1get~1all~1countries/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 39
+                    code:
+                      type: string
+                      example: KSA
+                    name:
+                      type: string
+                      example: Saudia Arabia
+                    countryCode:
+                      type: integer
+                      example: 966
+                    numberLength:
+                      type: integer
+                      example: 9
+                    enable:
+                      type: boolean
+                      example: true
+  /api/order/cancel:
+    post:
+      tags:
+        - Last Mile
+      summary: Cancel Order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  description: 'multiple tracking numbers can be cancelled API000000001,API000000002'
+                  type: string
+                  example: API000000001
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: '#/paths/~1api~1order~1cancel/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                      example: 1
+                    totalCreated:
+                      type: integer
+                      example: 1
+                    totalFailed:
+                      type: integer
+                      example: 0
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1order~1cancel/post/responses/200/content/application~1json/schema/orders'
+                orders:
+                  type: object
+                  properties:
+                    orderNumber:
+                      type: string
+                      example: a-9985
+                    orderTrackingNumber:
+                      type: string
+                      example: API000010001
+                    status:
+                      type: string
+                      example: success
+                    msg:
+                      type: string
+                      example: Order cancelled
+                    order:
+                      type: string
+                      example: null
+                    type:
+                      type: string
+                      example: null
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: '#/paths/~1api~1order~1cancel/post/responses/400/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                      example: 1
+                    totalCreated:
+                      type: integer
+                      example: 0
+                    totalFailed:
+                      type: integer
+                      example: 1
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1order~1cancel/post/responses/400/content/application~1json/schema/orders'
+                orders:
+                  type: object
+                  properties:
+                    orderNumber:
+                      type: string
+                      example: null
+                    orderTrackingNumber:
+                      type: string
+                      example: API000000023
+                    status:
+                      type: string
+                      example: fail
+                    msg:
+                      type: string
+                      example: Order Already Cancelled
+                    order:
+                      type: string
+                      example: null
+                    type:
+                      type: string
+                      example: null
+  /api/product:
+    get:
+      tags:
+        - Fulfilment
+      summary: Get All Products
+      parameters:
+        - in: query
+          name: timezone
+          description: 'Get the Timezone from this URL https://timezonedb.com/time-zones'
+          required: true
+          schema:
+            type: string
+            example: Asia/Riyadh
+        - in: query
+          name: size
+          description: 'if size is not defined by default is 10, we have these sizes available 10,20,50 and 100'
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - in: query
+          name: id
+          required: false
+          description: this is only required for pagination lastid of sku and   &next=next  for next page          for  previous page next=pre
+          schema:
+            type: string
+            example: lastid(100) &next=next  for next page    for  previous page next=pre
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/paths/~1api~1product/get/responses/200/content/application~1json/schema/data'
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  status:
+                    type: string
+                    example: success
+                data:
+                  type: object
+                  properties:
+                    count:
+                      type: number
+                      example: 100
+                    productSkuLogDTOS:
+                      type: string
+                      example: null
+                    Products:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1product/get/responses/200/content/application~1json/schema/Products'
+                Products:
+                  type: object
+                  properties:
+                    availableQuantity:
+                      type: string
+                      example: 10
+                    bin:
+                      type: string
+                      example: Small
+                    binsOccupied:
+                      type: string
+                      example: 10
+                    brand:
+                      type: string
+                      example: API Docs Product
+                    clientName:
+                      type: string
+                      example: API Docs-Client
+                    createdAt:
+                      type: string
+                      example: 1/1/23
+                    description:
+                      type: string
+                      example: API Docs Product
+                    height:
+                      type: string
+                      example: 1.5
+                    id:
+                      type: string
+                      example: 1234
+                    image:
+                      type: string
+                      example: null
+                    length:
+                      type: string
+                      example: 1.5
+                    referenceSku:
+                      type: string
+                      example: BS-123
+                    reservedQuantity:
+                      type: string
+                      example: 5
+                    trackingSku:
+                      type: string
+                      example: SKU1234
+                    type:
+                      type: string
+                      example: SINGLE/BUNDLE
+                    warehouse:
+                      type: string
+                      example: 1.5
+                    weight:
+                      type: string
+                      example: 1.5
+                    width:
+                      type: string
+                      example: 5.4
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Fail
+                  message:
+                    type: string
+                    example: No Data Found
+                  httpStatus:
+                    type: string
+                    example: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: Get All Products
+  /api/product/update:
+    post:
+      tags:
+        - Fulfilment
+      summary: Update Product Details
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/paths/~1api~1product~1update/post/responses/200/content/application~1json/schema/data'
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  status:
+                    type: string
+                    example: success
+                data:
+                  type: object
+                  properties:
+                    count:
+                      type: number
+                      example: 100
+                    productSkuLogDTOS:
+                      type: string
+                      example: null
+                    Products:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1product~1update/post/responses/200/content/application~1json/schema/Products'
+                Products:
+                  type: object
+                  properties:
+                    availableQuantity:
+                      type: string
+                      example: 10
+                    bin:
+                      type: string
+                      example: Small
+                    binsOccupied:
+                      type: string
+                      example: 10
+                    brand:
+                      type: string
+                      example: BO-Product
+                    clientName:
+                      type: string
+                      example: BO-Client
+                    createdAt:
+                      type: string
+                      example: 1/1/23
+                    description:
+                      type: string
+                      example: API Docs Product
+                    height:
+                      type: string
+                      example: 1.5
+                    id:
+                      type: string
+                      example: 4569
+                    image:
+                      type: string
+                      example: null
+                    length:
+                      type: string
+                      example: 1.5
+                    referenceSku:
+                      type: string
+                      example: BO-1
+                    reservedQuantity:
+                      type: string
+                      example: 5
+                    trackingSku:
+                      type: string
+                      example: SKU0000002
+                    type:
+                      type: string
+                      example: SINGLE/BUNDLE
+                    warehouse:
+                      type: string
+                      example: 1.5
+                    weight:
+                      type: string
+                      example: 1.5
+                    width:
+                      type: string
+                      example: 5.4
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Fail
+                  message:
+                    type: string
+                    example: Duplicate Reference SKU for API Docs Product
+                  httpStatus:
+                    type: string
+                    example: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - brand
+                - trackingSkus
+                - referenceSku
+                - weight
+                - Width
+                - height
+                - image
+                - description
+                - timezone
+              properties:
+                trackingSkus:
+                  description: Tracking SKU of API Docs
+                  type: string
+                  example: SKU00000001
+                referenceSku:
+                  description: 'Refrence SKU '
+                  type: string
+                  example: BS-1
+                brand:
+                  description: Product Name
+                  type: string
+                  example: Samsung
+                weight:
+                  description: greater than zero
+                  type: number
+                  example: 4.5
+                Width:
+                  description: greater than zero
+                  type: number
+                  example: 3.5
+                height:
+                  description: greater than zero
+                  type: number
+                  example: 2.5
+                image:
+                  description: Image Link
+                  type: string
+                  example: Image Link
+                description:
+                  description: product Description
+                  type: string
+                  example: Latest Samsung Mobile
+                timezone:
+                  description: 'Get the Timezone from this URL https://timezonedb.com/time-zones'
+                  type: string
+                  example: Asia/Riyadh
+        description: Update Product Details
+  /api/get/status:
+    get:
+      tags:
+        - Last Mile
+      summary: Get Order Statuses
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/paths/~1api~1get~1status/get/responses/200/content/application~1json/schema/data'
+                data:
+                  type: array
+                  items:
+                    example: 'CREATED,PICKED,INTRANSIT,INTL_INTRANSIT,RECEIVED_IN_HUB,CUSTOM_RECEIVED,SHELVED,READY_FOR_DISPATCH,OUT_FOR_DELIVERY,READY_FOR_PICKUP,DELIVERED,NOT_DELIVERED,RETURN_TO_CLIENT,RETURN_TO_HUB'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Fail
+                  message:
+                    type: string
+                    example: Bad Request
+                  httpStatus:
+                    type: string
+                    example: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: Get Order Statuses
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

@@ -1,0 +1,103 @@
+image: atlassian/default-image:latest
+
+pipelines:
+  branches:
+    dev:
+      - step:
+          name: Building and pushing image
+          image: node:14.5.0-alpine
+          script:
+            - echo $dockerAuth | docker login -u _json_key --password-stdin $dockerRepo
+            - docker build . -t $image:dev
+            - docker push $image:dev
+          services:
+            - docker
+          caches:
+            - docker
+      - step:
+          name: Kubernetes deployment restart
+          image: google/cloud-sdk:latest
+          script:
+            - apt-get update && apt-get install dnsutils -y
+            - NEW_CIDR_BLOCK=$(dig +short myip.opendns.com @resolver1.opendns.com)
+            - echo $NEW_CIDR_BLOCK
+            - echo $dockerAuth > ~/.gcloud-api-key.json
+            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+            - gcloud container clusters get-credentials $cluster --zone $zone --project $project
+            - cidr_blocks=$(gcloud container clusters describe $cluster --zone $zone --project $project --format="value(masterAuthorizedNetworksConfig.cidrBlocks)" | grep -oE "'cidrBlock':\ '[^']+'")
+            - EXISTING_CIDR_BLOCKS=""
+            - while IFS= read -r cidr_block; do
+            - cidr=$(echo "$cidr_block" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+")
+            - EXISTING_CIDR_BLOCKS+=",$cidr"
+            - done <<< "$cidr_blocks"
+            - EXISTING_CIDR_BLOCKS=${EXISTING_CIDR_BLOCKS#,}
+            - gcloud container clusters update $cluster --zone $zone --project $project --enable-master-authorized-networks --master-authorized-networks $EXISTING_CIDR_BLOCKS,$NEW_CIDR_BLOCK/32
+            - kubectl get pods -n $namespace
+            - kubectl rollout restart deployment $deployment -n $namespace
+    master:
+      - step:
+          name: Building and pushing image
+          image: node:14.5.0-alpine
+          script:
+            - echo $dockerAuth | docker login -u _json_key --password-stdin $dockerRepo
+            - docker build . -t $image:live
+            - docker push $image:live
+          services:
+            - docker
+          caches:
+            - node
+            - docker
+      - step:
+          name: Replacing GCP Instance Group
+          image: google/cloud-sdk:latest
+          script:
+            - apt-get update && apt-get install dnsutils -y
+            - NEW_CIDR_BLOCK=$(dig +short myip.opendns.com @resolver1.opendns.com)
+            - echo $NEW_CIDR_BLOCK
+            - echo $dockerAuth > ~/.gcloud-api-key.json
+            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+            - gcloud container clusters get-credentials $cluster --zone $zone --project $project
+            - cidr_blocks=$(gcloud container clusters describe $cluster --zone $zone --project $project --format="value(masterAuthorizedNetworksConfig.cidrBlocks)" | grep -oE "'cidrBlock':\ '[^']+'")
+            - EXISTING_CIDR_BLOCKS=""
+            - while IFS= read -r cidr_block; do
+            - cidr=$(echo "$cidr_block" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+")
+            - EXISTING_CIDR_BLOCKS+=",$cidr"
+            - done <<< "$cidr_blocks"
+            - EXISTING_CIDR_BLOCKS=${EXISTING_CIDR_BLOCKS#,}
+            - gcloud container clusters update $cluster --zone $zone --project $project --enable-master-authorized-networks --master-authorized-networks $EXISTING_CIDR_BLOCKS,$NEW_CIDR_BLOCK/32
+            - kubectl get pods -n $namespace1
+            - kubectl rollout restart deployment $deployment1 -n $namespace1
+
+    multi-tenant:
+      - step:
+          name: Building and pushing image
+          image: node:14.5.0-alpine
+          script:
+            - echo $dockerAuth | docker login -u _json_key --password-stdin $dockerRepo
+            - docker build . -t $image:saas
+            - docker push $image:saas
+          services:
+            - docker
+          caches:
+            - node
+            - docker
+      - step:
+          name: Replacing GCP Instance Group
+          image: google/cloud-sdk:latest
+          script:
+            - apt-get update && apt-get install dnsutils -y
+            - NEW_CIDR_BLOCK=$(dig +short myip.opendns.com @resolver1.opendns.com)
+            - echo $NEW_CIDR_BLOCK
+            - echo $dockerAuth > ~/.gcloud-api-key.json
+            - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
+            - gcloud container clusters get-credentials $cluster --zone $zone --project $project
+            - cidr_blocks=$(gcloud container clusters describe $cluster --zone $zone --project $project --format="value(masterAuthorizedNetworksConfig.cidrBlocks)" | grep -oE "'cidrBlock':\ '[^']+'")
+            - EXISTING_CIDR_BLOCKS=""
+            - while IFS= read -r cidr_block; do
+            - cidr=$(echo "$cidr_block" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+")
+            - EXISTING_CIDR_BLOCKS+=",$cidr"
+            - done <<< "$cidr_blocks"
+            - EXISTING_CIDR_BLOCKS=${EXISTING_CIDR_BLOCKS#,}
+            - gcloud container clusters update $cluster --zone $zone --project $project --enable-master-authorized-networks --master-authorized-networks $EXISTING_CIDR_BLOCKS,$NEW_CIDR_BLOCK/32
+            - kubectl get pods -n $namespace1
+            - kubectl rollout restart deployment $deployment1 -n $namespace1

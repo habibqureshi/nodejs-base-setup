@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "root",
+    "password": "C@UI75^[__#ht\"I4",
+    "database": "common",
+    "host": "10.108.224.5",
+    "dialect": "mysql",
+    "port": "3306",
+    "pool": {
+      "max": 5,
+      "min": 0
+    },
+    "logging": false
+  },
+  "test": {
+    "username": "root",
+    "password": "IycpmNB9xbHktbtG",
+    "database": "erp_test",
+    "host": "34.69.178.221",
+    "dialect": "mysql"
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "mysql"
+  }
+}

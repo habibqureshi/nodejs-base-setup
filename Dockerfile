@@ -8,6 +8,6 @@ COPY package.json ./
 
 COPY . .
 
-RUN npm i
+RUN npm ci
 
 CMD ["node","./bin/www"]

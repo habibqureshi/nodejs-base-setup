@@ -148,8 +148,8 @@ steps:
       fi
       echo "cluster credentials fetched"
 
-      #kubectl rollout restart deployment $DEPLOYMENT_NAME -n $WORKLOAD_NS
-      kubectl get po -n $WORKLOAD_NS
+      kubectl rollout restart deployment $DEPLOYMENT_NAME -n $WORKLOAD_NS
+      # kubectl get po -n $WORKLOAD_NS
       if [ $? -ne 0 ]; then
           echo "Failed to get cluster credentials"
           exit 1

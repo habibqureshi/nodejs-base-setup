@@ -13,8 +13,9 @@ const {
   ManagementController,
   CacheController,
   DomainController,
+  TenantSettingsController,
 } = require("./app/controller");
-const { get } = require("./app/services").TenantService;
+
 const apiSpec = YAML.load("./app/docs/openapi.yaml");
 const models = require("./app/database");
 const requestLimiter = require("./app/middlewares/request-limiter");

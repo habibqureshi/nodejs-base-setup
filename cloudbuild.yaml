@@ -86,7 +86,6 @@ steps:
       CONFIG_LOC=~/config.json
       UPDATE_CONFIG_LOC=~/updateConfig.json 
       CLOUD_BUILD_IP=$(curl -s ifconfig.me)
-      DISPLAY_NAME=Cloudbuild-$BUILD_ID
 
       apt-get update && apt-get install -y jq curl
 
@@ -97,12 +96,11 @@ steps:
       fi
       echo "Fetched master authorized config"
 
-      jq '.update.desiredMasterAuthorizedNetworksConfig = .masterAuthorizedNetworksConfig | 
-          del(.masterAuthorizedNetworksConfig) | 
+      jq '.update.desiredMasterAuthorizedNetworksConfig = .masterAuthorizedNetworksConfig |
+          del(.masterAuthorizedNetworksConfig) |
           .update.desiredMasterAuthorizedNetworksConfig.enabled = true |
           .update.desiredMasterAuthorizedNetworksConfig.cidrBlocks += [{
-              "cidrBlock": "'$CLOUD_BUILD_IP'/32",
-              "displayName": "'$DISPLAY_NAME'"
+              "cidrBlock": "'$CLOUD_BUILD_IP'/32"
           }]' $CONFIG_LOC > $UPDATE_CONFIG_LOC
       if [ $? -ne 0 ]; then
           echo "Failed to modify network configuration"
@@ -110,19 +108,7 @@ steps:
       fi
       echo "network configuration updated successfully"
 
-      ACCESS_TOKEN=$(gcloud auth print-access-token)
-      if [ -z "$ACCESS_TOKEN" ]; then
-          echo "Failed to get access token."
-          exit 1
-      fi
-      echo "Access token generated"
-
-      curl -X PUT \
-          -H "Authorization: Bearer $ACCESS_TOKEN" \
-          -H "Content-Type: application/json" \
-          -H "Accept: application/json" \
-          --data @"$UPDATE_CONFIG_LOC" \
-          "https://container.googleapis.com/v1beta1/projects/$PROJECT_ID/locations/$CLOUDSDK_COMPUTE_ZONE/clusters/$CLOUDSDK_CONTAINER_CLUSTER"
+      gcloud container clusters update $CLOUDSDK_CONTAINER_CLUSTER --zone $CLOUDSDK_COMPUTE_ZONE --project $PROJECT_ID --enable-master-authorized-networks --master-authorized-networks $(jq -r '.update.desiredMasterAuthorizedNetworksConfig.cidrBlocks | map(.cidrBlock) | join(",")' $UPDATE_CONFIG_LOC)
       if [ $? -ne 0 ]; then
           echo "Failed to update cluster configuration."
           exit 1
@@ -174,6 +160,7 @@ steps:
       CONFIG_LOC=~/config.json
       UPDATE_CONFIG_LOC=~/updateConfig.json 
       DISPLAY_NAME=Cloudbuild-$BUILD_ID
+      CLOUD_BUILD_IP=$(curl -s ifconfig.me)
 
       apt-get update && apt-get install -y jq curl
 
@@ -184,24 +171,18 @@ steps:
       fi
       echo "Fetched master authorized config"
 
-      jq '.update.desiredMasterAuthorizedNetworksConfig = .masterAuthorizedNetworksConfig | 
-          del(.masterAuthorizedNetworksConfig) | 
-          .update.desiredMasterAuthorizedNetworksConfig.enabled = "true" |
-          del(.update.desiredMasterAuthorizedNetworksConfig.cidrBlocks[] | 
-          select(.displayName=="'$DISPLAY_NAME'"))' $CONFIG_LOC > $UPDATE_CONFIG_LOC
+      jq '.update.desiredMasterAuthorizedNetworksConfig = .masterAuthorizedNetworksConfig |
+          del(.masterAuthorizedNetworksConfig) |
+          .update.desiredMasterAuthorizedNetworksConfig.enabled = "true" | 
+          (.update.desiredMasterAuthorizedNetworksConfig.cidrBlocks |= index({cidrBlock: "'$CLOUD_BUILD_IP'/32"}) as $i | 
+          .[0:$i] + .[$i+1:])' $CONFIG_LOC > $UPDATE_CONFIG_LOC
       if [ $? -ne 0 ]; then
           echo "Failed to modify network configuration"
           exit 1
       fi
       echo "network configuration updated successfully"
 
-      ACCESS_TOKEN=$(gcloud auth print-access-token)
-      curl -X PUT \
-          -H "Authorization: Bearer $ACCESS_TOKEN" \
-          -H "Content-Type: application/json" \
-          -H "Accept: application/json" \
-          --data @"$UPDATE_CONFIG_LOC" \
-          "https://container.googleapis.com/v1beta1/projects/$PROJECT_ID/locations/$CLOUDSDK_COMPUTE_ZONE/clusters/$CLOUDSDK_CONTAINER_CLUSTER"
+      gcloud container clusters update $CLOUDSDK_CONTAINER_CLUSTER --zone $CLOUDSDK_COMPUTE_ZONE --project $PROJECT_ID --enable-master-authorized-networks --master-authorized-networks $(jq -r '.update.desiredMasterAuthorizedNetworksConfig.cidrBlocks | map(.cidrBlock) | join(",")' $UPDATE_CONFIG_LOC)
       if [ $? -ne 0 ]; then
           echo "Failed to update cluster configuration."
           exit 1

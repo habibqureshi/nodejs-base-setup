@@ -1,10 +1,10 @@
-const db = require('../database');
+const db = require("../database");
 const Sequelize = db.Sequelize;
 const sequelize = db.sequelize;
 const DataTypes = Sequelize.DataTypes;
 
 const Tenant = sequelize.define(
-  'tenant',
+  "tenant",
   {
     id: {
       type: DataTypes.INTEGER(11),
@@ -54,13 +54,17 @@ const Tenant = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    settings: {
+      type: DataTypes.JSON(),
+      allowNull: true,
+    },
   },
   {
     underscored: true,
     timestamps: true,
     freezeTableName: true,
     // define the table's name
-    tableName: 'tenant',
+    tableName: "tenant",
   }
 );
 

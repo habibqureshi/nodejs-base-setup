@@ -1,0 +1,37 @@
+const express = require('express');
+const { logger: log } = require('../utils/logger');
+const context = require('../utils/async-context');
+const { get } = require('../services').TenantService;
+const { Tenant } = require('../models');
+const authorizeAuthenticate = require('../middlewares/security/authorize-authenticate');
+const Util = require('../utils/Util');
+const router = express.Router();
+router.get('/settings', async (req, res, next) => {
+  try {
+    log.info('getting tenant settings');
+    const tenant = await get(context.get('db'));
+    if (tenant.dataValues.settings) {
+      return Util.getOkRequest(
+        tenant.dataValues.settings,
+        'setting found',
+        res
+      );
+    }
+    return Util.getBadRequest('Settings Not Found', res);
+  } catch (error) {
+    next(error);
+  }
+});
+router.put('/settings', authorizeAuthenticate, async (req, res, next) => {
+  try {
+    log.info('updating tenant settings');
+    const { settings } = req.body;
+    const tenant = await get(context.get('db'));
+    tenant.set('settings', settings);
+    await tenant.save();
+    return Util.getOkRequest(null, 'tenant settings updated', res);
+  } catch (error) {
+    next(error);
+  }
+});
+module.exports = router;

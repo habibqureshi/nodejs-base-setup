@@ -176,6 +176,19 @@ steps:
       DISPLAY_NAME=Cloudbuild-$BUILD_ID
       CLOUD_BUILD_IP=$(curl -s ifconfig.me)
 
+      wait_for_operations(){
+        while true; do
+          ongoing_operations=$(gcloud container operations list --filter="status!=DONE AND targetLink:clusters/$CLOUDSDK_CONTAINER_CLUSTER AND zone:$CLOUDSDK_COMPUTE_ZONE" --format="value(name)")
+          if [ -z $ongoing_operations ]; then
+            echo "No ongoing operation"
+            break
+          else
+            echo "Waiting for operations"
+            echo $ongoing_operations
+          fi
+        done
+      }
+
       apt-get update && apt-get install -y jq curl
 
       gcloud container clusters describe $CLOUDSDK_CONTAINER_CLUSTER --zone $CLOUDSDK_COMPUTE_ZONE --project $PROJECT_ID --format "json(masterAuthorizedNetworksConfig.cidrBlocks)" > $CONFIG_LOC
@@ -196,6 +209,7 @@ steps:
       fi
       echo "network configuration updated successfully"
 
+      wait_for_operations
       gcloud container clusters update $CLOUDSDK_CONTAINER_CLUSTER --zone $CLOUDSDK_COMPUTE_ZONE --project $PROJECT_ID --enable-master-authorized-networks --master-authorized-networks $(jq -r '.update.desiredMasterAuthorizedNetworksConfig.cidrBlocks | map(.cidrBlock) | join(",")' $UPDATE_CONFIG_LOC)
       if [ $? -ne 0 ]; then
           echo "Failed to update cluster configuration."

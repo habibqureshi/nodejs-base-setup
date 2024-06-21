@@ -6,21 +6,22 @@ const { getConnection } = require('../middlewares/tenant-manager');
 const { logger } = require('../utils/logger');
 
 const fetchUserForLogin = async (username, password, callback) => {
-  const user = await getConnection().User.findOne({
+  const { User, Roles, Permission, WareHouse } = getConnection();
+  const user = await User.findOne({
     include: [
       // { model: dbRepo[dbKey].Roles, include: [dbRepo[dbKey].Permission] },
       {
-        model: getConnection().Roles,
+        model: Roles,
         attributes: ['id'],
         include: [
           {
-            model: getConnection().Permission,
+            model: Permission,
             attributes: ['name'],
           },
         ],
       },
       {
-        model: getConnection().WareHouse,
+        model: WareHouse,
         attributes: ['id', 'name'],
       },
     ],
@@ -58,7 +59,7 @@ const fetchUserForLogin = async (username, password, callback) => {
 };
 
 const fetchUserWithUsername = async (username) => {
-  const { User, Roles, Permission } = getConnection();
+  const { User, Roles, Permission, WareHouse } = getConnection();
   return await User.findOne({
     include: [
       {
@@ -72,7 +73,7 @@ const fetchUserWithUsername = async (username) => {
         ],
       },
       {
-        model: getConnection().WareHouse,
+        model: WareHouse,
         attributes: ['id', 'name'],
       },
     ],

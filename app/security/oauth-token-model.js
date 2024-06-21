@@ -137,6 +137,8 @@ module.exports = {
     const permissionsArray = Util.makePermissionsArrayForAuthentication(
       user.Roles
     );
+    const warehousesArray = Util.makeWarehousesArray(user.WareHouses);
+
     return {
       accessToken: accessToken.accessToken,
       tokenType: 'bearer',
@@ -149,6 +151,8 @@ module.exports = {
       name: user.name,
       user: {},
       client: {},
+      id: user.id,
+      warehouses: warehousesArray,
     };
   },
 };

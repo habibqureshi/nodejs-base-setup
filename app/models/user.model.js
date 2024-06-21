@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'user_id',
         timestamps: false,
       });
+      User.belongsToMany(models.WareHouse, {
+        through: 'warehouse_users',
+        foreignKey: 'user_id',
+        timestamps: false,
+      });
       User.hasMany(models.AccessToken, {
         foreignKey: 'user_id',
       });

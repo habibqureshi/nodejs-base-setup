@@ -101,6 +101,19 @@ class Util {
     return permissionsArray;
   }
 
+  static makeWarehousesArray(warehouses) {
+    const warehouseArray = [];
+    if (warehouses && warehouses.length > 0) {
+      warehouses.forEach((warehouse) => {
+        warehouseArray.push({
+          id: warehouse.id,
+          name: warehouse.name,
+        });
+      });
+    }
+    return warehouseArray;
+  }
+
   static makePermissionsArrayForAuthorizationFilter(rolesArray) {
     const permissionsArray = [];
     rolesArray.map((role) => {

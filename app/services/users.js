@@ -1,4 +1,4 @@
-const { Roles, Permission, User } = require('../models');
+const { Roles, Permission, User, WareHouse } = require('../models');
 const bcrypt = require('bcrypt');
 const dbRepo = require('../models/db_repo');
 const context = require('../utils/async-context');
@@ -18,6 +18,10 @@ const fetchUserForLogin = async (username, password, callback) => {
             attributes: ['name'],
           },
         ],
+      },
+      {
+        model: getConnection().WareHouse,
+        attributes: ['id', 'name'],
       },
     ],
 
@@ -66,6 +70,10 @@ const fetchUserWithUsername = async (username) => {
             attributes: ['name', 'endpoint'],
           },
         ],
+      },
+      {
+        model: getConnection().WareHouse,
+        attributes: ['id', 'name'],
       },
     ],
 

@@ -39,8 +39,8 @@ router.put('/settings', authorizeAuthenticate, async (req, res, next) => {
 router.delete('', async (req, res, next) => {
   try {
     const tenant = await get(context.get('db'));
-    log.info(`Removing tenant with ID: ${tenant}`);
-    await removeTenant(tenant);
+    log.info(`Removing tenant with ID: ${tenant.dataValues.tenantId}`);
+    await removeTenant(tenant.dataValues.tenantId);
     return Util.getOkRequest(null, 'Tenant removed successfully', res);
   } catch (error) {
     next(error);

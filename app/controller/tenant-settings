@@ -2,6 +2,7 @@ const express = require('express');
 const { logger: log } = require('../utils/logger');
 const context = require('../utils/async-context');
 const { get } = require('../services').TenantService;
+const { removeTenant } = require('../middlewares/tenant-manager');
 const { Tenant } = require('../models');
 const authorizeAuthenticate = require('../middlewares/security/authorize-authenticate');
 const Util = require('../utils/Util');
@@ -34,4 +35,16 @@ router.put('/settings', authorizeAuthenticate, async (req, res, next) => {
     next(error);
   }
 });
+
+router.delete('', async (req, res, next) => {
+  try {
+    const tenant = await get(context.get('db'));
+    log.info(`Removing tenant with ID: ${tenant.dataValues.tenantId}`);
+    await removeTenant(tenant.dataValues.tenantId);
+    return Util.getOkRequest(null, 'Tenant removed successfully', res);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

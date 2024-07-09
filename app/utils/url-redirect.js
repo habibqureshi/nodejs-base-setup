@@ -212,6 +212,10 @@ let urls = {
       originalUrl: '/platform/salla/token',
       backend: managementBackEnd,
     },
+    '/platform/salla/validate/and/integrate': {
+      originalUrl: '/platform/salla/validate/and/integrate',
+      backend: managementBackEnd,
+    },
   },
   LM: {
     '/**': {

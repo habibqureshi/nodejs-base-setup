@@ -18,6 +18,8 @@ async function checkTenant(tenant) {
     let tenantFromDB = await Tenant.findOne({
       where: {
         tenantId: tenant,
+        enable: true,
+        deleted: false,
       },
     });
     if (!tenantFromDB || !tenantFromDB.enable)
@@ -38,6 +40,10 @@ async function checkTenant(tenant) {
 async function initializeTenants() {
   try {
     let tenants = await Tenant.findAll({
+      where: {
+        enable: true,
+        deleted: false,
+      },
       raw: true,
     });
     tenants.forEach((tenant) =>

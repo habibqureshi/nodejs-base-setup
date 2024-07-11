@@ -61,29 +61,29 @@ steps:
   #       path: /root/.m2
 
   #Pulling latest image
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
     id: latest_container
-    args: ["-c", "docker pull ${_IMAGE_NAME} || exit 0"]
+    args: ['-c', 'docker pull ${_IMAGE_NAME} || exit 0']
 
   #Building docker image
   - name: gcr.io/cloud-builders/docker
-    id: "Building container"
+    id: 'Building container'
     args:
-      ["build", "-t", "${_IMAGE_NAME}", "--cache-from", "${_IMAGE_NAME}", "."]
+      ['build', '-t', '${_IMAGE_NAME}', '--cache-from', '${_IMAGE_NAME}', '.']
     waitFor:
       - latest_container
   - name: gcr.io/cloud-builders/docker
     id: publishing
-    args: [push, "${_IMAGE_NAME}"]
+    args: [push, '${_IMAGE_NAME}']
 
   - name: gcr.io/cloud-builders/gcloud
     id: ssh to vm
     entrypoint: /bin/sh
     args:
-      - "-c"
+      - '-c'
       - |
-        gcloud compute ssh cloudbuild@dev-server --zone=us-central1-c --command='/bin/sh /home/chronos/deploy.sh'
+        gcloud compute ssh cloudbuild@dev-server --zone=us-central1-c --command='/bin/sh deploy.sh'
 
 substitutions:
   _CLUSTER_ZONE: default

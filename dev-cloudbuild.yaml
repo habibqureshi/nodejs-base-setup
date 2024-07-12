@@ -83,7 +83,7 @@ steps:
     args:
       - '-c'
       - |
-        gcloud compute ssh cloudbuild@dev-server --zone=us-central1-c --command='/bin/sh deploy.sh'
+        gcloud compute ssh cloudbuild@dev-server --zone=us-central1-b --command='/bin/sh deploy.sh'
 
 substitutions:
   _CLUSTER_ZONE: default

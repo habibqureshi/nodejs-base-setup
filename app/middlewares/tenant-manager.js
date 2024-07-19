@@ -19,8 +19,6 @@ async function checkTenant(tenant) {
     let tenantFromDB = await Tenant.findOne({
       where: {
         tenantId: tenant,
-        // enable: true,
-        // deleted: false,
       },
     });
     if (!tenantFromDB) throw new TenantNotFoundError('invalid host');

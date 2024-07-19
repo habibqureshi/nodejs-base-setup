@@ -4,6 +4,7 @@ const Tenant = require('../models/tenant.model');
 const DBConnector = require('../utils/dbconnector');
 const { logger } = require('../utils/logger');
 const TenantNotFoundError = require('../utils/tenant-not-found-error');
+const TenantDisableError = require('../utils/tenant-disable-error');
 
 function getConnection() {
   if (dbRepo && context.get('db')) {
@@ -18,12 +19,17 @@ async function checkTenant(tenant) {
     let tenantFromDB = await Tenant.findOne({
       where: {
         tenantId: tenant,
-        enable: true,
-        deleted: false,
+        // enable: true,
+        // deleted: false,
       },
     });
-    if (!tenantFromDB || !tenantFromDB.enable)
-      throw new TenantNotFoundError('invalid host');
+    if (!tenantFromDB) throw new TenantNotFoundError('invalid host');
+
+    if (!tenantFromDB.enable) {
+      throw new TenantDisableError(
+        'Please contact support@techshipsa.com or +966553800916 to access your account'
+      );
+    }
 
     DBConnector.addSequelizeConnectionToRepo(
       dbRepo,

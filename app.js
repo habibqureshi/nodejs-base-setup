@@ -35,6 +35,7 @@ const {
 const TenantNotFoundError = require('./app/utils/tenant-not-found-error');
 const { requestForwarder } = require('./app/middlewares/request-forwarder');
 const { requestHandler } = require('./app/middlewares/request-handler');
+const TenantDisableError = require('./app/utils/tenant-disable-error');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -76,6 +77,9 @@ app.use(async (req, res, next) => {
     if (error instanceof TenantNotFoundError) {
       logger.info('host not found with id', host);
       return Util.getUnauthorizedRequest(error.message, res);
+    } else if (error instanceof TenantDisableError) {
+      logger.info('tenant is disabled with id', host);
+      return Util.getPaymentNecessaryRequest(error.message, res);
     }
     next(error);
   }

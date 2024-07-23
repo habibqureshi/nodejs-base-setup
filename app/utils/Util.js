@@ -53,6 +53,14 @@ class Util {
     return res.status(StatusCodes.UNAUTHORIZED).send(response);
   }
 
+  static getPaymentNecessaryRequest(msg, res) {
+    const response = new Response();
+    response.setMessage(msg);
+    response.setStatus(Constant.FAIL);
+    response.setStatusCode(StatusCodes.PAYMENT_REQUIRED);
+    return res.status(StatusCodes.PAYMENT_REQUIRED).send(response);
+  }
+
   static getForbiddenRequest(msg, res) {
     const response = new Response();
     response.setMessage(msg);

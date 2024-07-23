@@ -53,6 +53,14 @@ class Util {
     return res.status(StatusCodes.UNAUTHORIZED).send(response);
   }
 
+  static getPaymentNecessaryRequest(msg, res) {
+    const response = new Response();
+    response.setMessage(msg);
+    response.setStatus(Constant.FAIL);
+    response.setStatusCode(StatusCodes.PAYMENT_REQUIRED);
+    return res.status(StatusCodes.PAYMENT_REQUIRED).send(response);
+  }
+
   static getForbiddenRequest(msg, res) {
     const response = new Response();
     response.setMessage(msg);
@@ -112,6 +120,16 @@ class Util {
       });
     }
     return warehouseArray;
+  }
+
+  static makeClientsIdsArray(clients) {
+    const clientIds = [];
+    if (clients && clients.length > 0) {
+      clients.forEach((client) => {
+        clientIds.push(client.id);
+      });
+    }
+    return clientIds;
   }
 
   static makePermissionsArrayForAuthorizationFilter(rolesArray) {

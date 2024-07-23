@@ -17,6 +17,7 @@ async function multerService(req, res, next) {
     { name: 'user', maxCount: 1 },
     { name: 'file', maxCount: 1 },
     { name: 'warehouseId', maxCount: 1 },
+    { name: 'warehouse', maxCount: 1 },
     { name: 'replenishmentId', maxCount: 1 },
     { name: 'from', maxCount: 1 },
     { name: 'to', maxCount: 1 },
@@ -33,9 +34,10 @@ async function multerService(req, res, next) {
       }
       logger.info('User -> ', req.body.user);
       logger.info('warehouse ID -> ', req.body.warehouseId);
+      logger.info('warehouse -> ', req.body.warehouse);
       logger.info('replenishment ID -> ', req.body.replenishmentId);
       logger.info('From -> ', req.body.from);
-      logger.info('From -> ', req.body.to);
+      logger.info('To -> ', req.body.to);
       const formData = new FormData();
       req.files?.file?.map((e) => {
         formData.append(e.fieldname, e.buffer, {
@@ -55,6 +57,9 @@ async function multerService(req, res, next) {
       req.body &&
         req.body.warehouseId &&
         formData.append('warehouseId', req.body.warehouseId);
+      req.body &&
+        req.body.warehouse &&
+        formData.append('warehouse', req.body.warehouse);
       req.body &&
         req.body.replenishmentId &&
         formData.append('replenishmentId', req.body.replenishmentId);

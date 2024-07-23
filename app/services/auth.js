@@ -46,6 +46,13 @@ const getUserIDFromBearerToken = async (bearerToken) => {
             model: getConnection().Roles,
             include: [{ model: getConnection().Permission }],
           },
+          {
+            model: getConnection().WareHouse,
+          },
+          {
+            model: getConnection().Client,
+            attributes: ['id'],
+          },
         ],
       },
     ],

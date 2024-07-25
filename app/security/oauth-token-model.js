@@ -22,6 +22,14 @@ module.exports = {
     const permissionsArray = Util.makePermissionsArrayForAuthorizationFilter(
       token.User.Roles
     );
+
+    //An array of warehouses objects Passed in the User object for the BE to store in the session against the key named userWarehouses
+    const wareHouseArray = Util.makeWarehousesArray(token.User.WareHouses);
+    //An array of client Ids Passed in the User object for the BE to store in the session against the key named userClients
+    const clientIds = token.User.Clients
+      ? token.User.Clients.map((client) => client.id)
+      : [];
+
     try {
       const {
         id,
@@ -51,6 +59,8 @@ module.exports = {
           userRoles: Roles,
           type,
           email,
+          userWarehouses: wareHouseArray,
+          userClients: clientIds,
         },
         permissions: permissionsArray,
       };

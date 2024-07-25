@@ -25,7 +25,7 @@ async function checkTenant(tenant) {
 
     if (!tenantFromDB.enable) {
       throw new TenantDisableError(
-        'Please contact support@techshipsa.com or +966553800916 to access your account'
+        'Dear Customer, Please contact techship account manager at contact@techshipsa.com or +966 553800916'
       );
     }
 

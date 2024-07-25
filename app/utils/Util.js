@@ -122,16 +122,6 @@ class Util {
     return warehouseArray;
   }
 
-  static makeClientsIdsArray(clients) {
-    const clientIds = [];
-    if (clients && clients.length > 0) {
-      clients.forEach((client) => {
-        clientIds.push(client.id);
-      });
-    }
-    return clientIds;
-  }
-
   static makePermissionsArrayForAuthorizationFilter(rolesArray) {
     const permissionsArray = [];
     rolesArray.map((role) => {

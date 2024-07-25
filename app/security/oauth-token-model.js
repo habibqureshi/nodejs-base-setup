@@ -26,7 +26,9 @@ module.exports = {
     //An array of warehouses objects Passed in the User object for the BE to store in the session against the key named userWarehouses
     const wareHouseArray = Util.makeWarehousesArray(token.User.WareHouses);
     //An array of client Ids Passed in the User object for the BE to store in the session against the key named userClients
-    const clientIds = Util.makeClientsIdsArray(token.User.Clients);
+    const clientIds = token.User.Clients
+      ? token.User.Clients.map((client) => client.id)
+      : [];
 
     try {
       const {

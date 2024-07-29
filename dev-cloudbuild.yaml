@@ -1,0 +1,93 @@
+steps:
+  #Restring Cache
+  # # - name: "gcr.io/cloud-builders/gsutil"
+  # #   entrypoint: sh
+  # #   id: restore_cache
+  # #   args:
+  # #     [
+  # #       "-c",
+  # #       "gsutil cp gs://${PROJECT_ID}_cloudbuild/maven-$(cksum pom.xml | cut -d' ' -f1 | tr ' ' -).tgz cache.tgz || exit 0 && tar -xzf cache.tgz -C /root/.m2",
+  # #     ]
+  # #   volumes:
+  # #     - name: m2_cache
+  # #       path: "/root/.m2"
+  # - name: gcr.io/$PROJECT_ID/restore_cache
+  #   id: restore_cache
+  #   args:
+  #     [
+  #       "-b=gs://${PROJECT_ID}_cloudbuild",
+  #       "-k=npm-rbas-$(checksum package.json)-$(checksum package-lock.json)",
+  #       "-kf=maven-",
+  #     ]
+  #   volumes:
+  #     - path: /root/.m2
+  #       name: m2_cache
+
+  # #Compiling with maven
+  # - name: maven:3.6.3-jdk-8-slim
+  #   entrypoint: mvn
+  #   id: "Compiling"
+  #   args: ["clean", "install", "-Plive", "-DskipTests"]
+  #   env:
+  #     - MAVEN_OPTS=-Dmaven.repo.local=/root/.m2
+  #   waitFor:
+  #     - restore_cache
+  #   volumes:
+  #     - name: m2_cache
+  #       path: "/root/.m2"
+
+  # #Saving cache
+  # # - name: "gcr.io/cloud-builders/gsutil"
+  # #   entrypoint: sh
+  # #   id: save_cache
+  # #   args:
+  # #     [
+  # #       "-c",
+  # #       "cd /root/.m2 && tar -czf cache.tgz * && gsutil cp cache.tgz gs://${PROJECT_ID}_cloudbuild/maven-$(cd /workspace && cksum pom.xml | cut -d' ' -f1 | tr ' ' -).tgz",
+  # #     ]
+  # #   volumes:
+  # #     - name: m2_cache
+  # #       path: "/root/.m2"
+  # - name: gcr.io/$PROJECT_ID/save_cache
+  #   args:
+  #     [
+  #       "-b=gs://${PROJECT_ID}_cloudbuild",
+  #       "-k=npm-rbas-$(checksum package.json)-$(checksum package-lock.json)",
+  #       "-p=/root/.m2",
+  #       "-n",
+  #     ]
+  #   volumes:
+  #     - name: m2_cache
+  #       path: /root/.m2
+
+  #Pulling latest image
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    id: latest_container
+    args: ['-c', 'docker pull ${_IMAGE_NAME} || exit 0']
+
+  #Building docker image
+  - name: gcr.io/cloud-builders/docker
+    id: 'Building container'
+    args:
+      ['build', '-t', '${_IMAGE_NAME}', '--cache-from', '${_IMAGE_NAME}', '.']
+    waitFor:
+      - latest_container
+  - name: gcr.io/cloud-builders/docker
+    id: publishing
+    args: [push, '${_IMAGE_NAME}']
+
+  - name: gcr.io/cloud-builders/gcloud
+    id: ssh to vm
+    entrypoint: /bin/sh
+    args:
+      - '-c'
+      - |
+        gcloud compute ssh cloudbuild@dev-server --zone=us-central1-b --command='/bin/sh deploy.sh'
+
+substitutions:
+  _CLUSTER_ZONE: default
+  _CLUSTER_NAME: default
+  _DEPLOYMENT_NAME: default
+  _WORKLOAD_NS: default
+  _IMAGE_NAME: default

@@ -232,6 +232,7 @@ async function validateAndCreateShopifyStore(req, res, next, backend) {
     id: client.id,
     clientType: client.type,
   };
+  logger.info('body', req.body);
   return await requestForwarder(req, res, next, backend);
 }
 

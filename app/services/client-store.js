@@ -230,7 +230,7 @@ async function validateAndCreateShopifyStore(req, res, next, backend) {
   }
   req.body.client = {
     id: client.id,
-    type: client.type,
+    clientType: client.type,
   };
   return await requestForwarder(req, res, next, backend);
 }

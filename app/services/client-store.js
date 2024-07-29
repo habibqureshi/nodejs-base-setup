@@ -221,9 +221,9 @@ async function validateAndCreateShopifyStore(req, res, next, backend) {
   }
   let client;
   if (req.user.currentUser.type != 'CLIENT') {
-    client = clientService.getClientById(req.body.webHook[0].client.id);
+    client = await clientService.getClientById(req.body.webHook[0].client.id);
   } else {
-    client = clientService.getClientByUser(req.user.currentUser.id);
+    client = await clientService.getClientByUser(req.user.currentUser.id);
   }
   if (client == null) {
     return Util.getBadRequest('Not Client');

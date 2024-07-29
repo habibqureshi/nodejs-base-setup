@@ -216,9 +216,6 @@ async function validateAndCreateShopifyStore(req, res, next, backend) {
     const webHook = [req.body.webHook];
     req.body.webHook = webHook;
   }
-  if (req.body.webHook == null || req.body.webHook.length == 0) {
-    return Util.getBadRequest('webHook cannot be null');
-  }
   let client;
   if (req.user.currentUser.type != 'CLIENT') {
     client = clientService.getClientById(req.body.webHook[0].client.id);

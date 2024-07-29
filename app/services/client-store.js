@@ -211,13 +211,10 @@ async function sallaOrderCreationCheck(req, res, next, client) {
 }
 
 async function validateAndCreateShopifyStore(req, res, next, backend) {
-  logger.info('creating new shopify store');
-  if (!req.body.webHook.isArray()) {
+  logger.info('creating new shopify store', JSON.stringify(req.body));
+  if (!Array.isArray(req.body.webHook)) {
     const webHook = [req.body.webHook];
     req.body.webHook = webHook;
-  }
-  if (req.body.webHook == null || req.body.webHook.length == 0) {
-    return Util.getBadRequest('webHook cannot be null');
   }
   let client;
   if (req.user.currentUser.type != 'CLIENT') {

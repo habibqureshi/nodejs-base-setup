@@ -211,8 +211,8 @@ async function sallaOrderCreationCheck(req, res, next, client) {
 }
 
 async function validateAndCreateShopifyStore(req, res, next, backend) {
-  logger.info('creating new shopify store');
-  if (!req.body.webHook.isArray()) {
+  logger.info('creating new shopify store', JSON.stringify(req.body));
+  if (!Array.isArray(req.body.webHook)) {
     const webHook = [req.body.webHook];
     req.body.webHook = webHook;
   }

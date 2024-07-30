@@ -36,6 +36,7 @@ const TenantNotFoundError = require('./app/utils/tenant-not-found-error');
 const { requestForwarder } = require('./app/middlewares/request-forwarder');
 const { requestHandler } = require('./app/middlewares/request-handler');
 const TenantDisableError = require('./app/utils/tenant-disable-error');
+const { TenantService } = require('./app/services');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -84,8 +85,13 @@ app.use(async (req, res, next) => {
     next(error);
   }
 });
-app.use('/docs', swaggerUi.serve, (req, res, next) => {
-  apiSpec.servers = [{ url: `https//${context.get('db')}` }];
+app.use('/docs', swaggerUi.serve, async (req, res, next) => {
+  const tenant = await TenantService.get(context.get('db'));
+  apiSpec.servers = [
+    {
+      url: `https//${tenant.chinaDomain || context.get('db')}`,
+    },
+  ];
   logger.info('servers', apiSpec.servers);
   return swaggerUi.setup(apiSpec)(req, res, next);
 });

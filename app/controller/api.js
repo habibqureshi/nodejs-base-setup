@@ -24,6 +24,10 @@ const { requestHandler } = require('../middlewares/request-handler');
 const { logger } = require('../utils/logger');
 const router = express.Router();
 
+router.get('/check', async (req, res, next) => {
+  return res.status(200);
+});
+
 router.post('/order/check/statuses', orderStatuses);
 router.post('/get/all/countries', getCountries);
 router.post('/get/all/cities', getCities);

@@ -25,7 +25,7 @@ const { logger } = require('../utils/logger');
 const router = express.Router();
 
 router.get('/check', async (req, res, next) => {
-  return res.status(200);
+  return res.status(200).json({ message: 'OK' });
 });
 
 router.post('/order/check/statuses', orderStatuses);

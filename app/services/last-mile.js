@@ -98,8 +98,6 @@ async function getAwb(req, res, next) {
   }
 }
 
-async function createOrderForTenant(req, res, next) {}
-
 module.exports = {
   createOrder,
   lastMileBulk,

@@ -315,7 +315,7 @@ router.post(
   }
 );
 
-router.post('/order/from/tenant', async (req, res, next) => {
+router.post('/create/order/for/tenant', async (req, res, next) => {
   req.body.orderCreationType = orderCreationType.API;
   return await requestHandler(req, res, next, createIntraTenantOrder);
 });

@@ -17,6 +17,8 @@ const {
   getShopifyStore,
   deleteShopifyStore,
 } = require('../services').ClientStoreService;
+const { createOrder: createIntraTenantOrder } =
+  require('../services').IntraTenantService;
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
 const orderType = require('../enums/order-type');
@@ -312,6 +314,11 @@ router.post(
     return await requestHandler(req, res, next, requestForwarder);
   }
 );
+
+router.post('/create/order/for/tenant', async (req, res, next) => {
+  req.body.orderCreationType = orderCreationType.API;
+  return await requestHandler(req, res, next, createIntraTenantOrder);
+});
 
 router.use('/**', async (req, res, next) => {
   try {

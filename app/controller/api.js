@@ -19,6 +19,7 @@ const {
 } = require('../services').ClientStoreService;
 const { createOrder: createIntraTenantOrder } =
   require('../services').IntraTenantService;
+const { createWebhook } = require('../services/webhook');
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
 const orderType = require('../enums/order-type');
@@ -38,6 +39,10 @@ router.post('/get/all/cities', getCities);
 router.post(['/create/order', '/create/order/'], async (req, res, next) => {
   req.body.orderCreationType = orderCreationType.API;
   return await requestHandler(req, res, next, createLastMileOrder);
+});
+
+router.post(['/webhook', '/webhook/'], async (req, res, next) => {
+  return await requestHandler(req, res, next, createWebhook);
 });
 
 //FUL

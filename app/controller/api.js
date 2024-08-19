@@ -23,12 +23,18 @@ const { createWebhook } = require('../services/webhook');
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
 const orderType = require('../enums/order-type');
+const { getClientByUser } = require('../services/client');
 const { requestHandler } = require('../middlewares/request-handler');
 const { logger } = require('../utils/logger');
 const router = express.Router();
 
 router.get('/check', async (req, res, next) => {
-  return res.status(200).json({ message: 'OK' });
+  const client = await getClientByUser(req.user.currentUser.id);
+    if (!client) {
+      logger.info('client not found with user id', req.user.currentUser.id);
+      return Util.getBadRequest('cannot find client from userId');
+    }
+    return res.status(200).json({ message: 'OK', type: client.clientType });
 });
 
 router.post('/order/check/statuses', orderStatuses);

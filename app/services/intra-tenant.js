@@ -1,5 +1,6 @@
 const { logger } = require('../utils/logger');
 const clientService = require('./client');
+const { requestForwarder } = require('../middlewares/request-forwarder');
 
 async function createOrder(req, res, next) {
   try {

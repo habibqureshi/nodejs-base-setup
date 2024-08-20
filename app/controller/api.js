@@ -70,6 +70,12 @@ router.post('/product', async (req, res, next) => {
   return await requestHandler(req, res, next, validateUserAndCreateProduct);
 });
 
+
+router.put('/product/tenant', async (req,res,next) => {
+  req.originalUrl = req.originalUrl.replace('/api/product/tenant', '/FUL/product/tenant');
+  return await requestHandler(req,res,next,requestForwarder);
+});
+
 //FUL
 router.get('/product', async (req, res, next) => {
   return await requestHandler(req, res, next, getProductList);

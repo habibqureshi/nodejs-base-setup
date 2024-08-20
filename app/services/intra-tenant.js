@@ -22,13 +22,13 @@ async function createOrder(req, res, next) {
       logger.info('fulfilment order');
       req.originalUrl = '/FUL/fulfilment/order';
       req.body.orderCreationType = orderCreationType.API;
-      req,body.orderType = orderType.FULFILMENT;
+      req.body.orderType = orderType.FULFILMENT;
       return await requestForwarder(req, res, next);
     } else {
       logger.info('last mile order');
       req.originalUrl = '/LM/order';
       req.body.orderCreationType = orderCreationType.API;
-      req,body.orderType = orderType.DROP_SHIP;
+      req.body.orderType = orderType.DROP_SHIP;
       return await requestForwarder(req, res, next);
     }
   } catch (error) {

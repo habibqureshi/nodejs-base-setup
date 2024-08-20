@@ -5,7 +5,7 @@ const {
   cancelOrder,
   getAwb,
 } = require('../services').LastMileService;
-const { createOrder: createFulfilmentOrder } =
+const { createOrder: createFulfilmentOrder, fulGetAwb } =
   require('./../services').FulfilmentService;
 const { getCities, getCountries, orderStatuses } =
   require('../services').ApiService;
@@ -30,11 +30,11 @@ const router = express.Router();
 
 router.get('/check', async (req, res, next) => {
   const client = await getClientByUser(req.user.currentUser.id);
-    if (!client) {
-      logger.info('client not found with user id', req.user.currentUser.id);
-      return Util.getBadRequest('cannot find client from userId');
-    }
-    return res.status(200).json({ message: 'OK', type: client.clientType });
+  if (!client) {
+    logger.info('client not found with user id', req.user.currentUser.id);
+    return Util.getBadRequest('cannot find client from userId');
+  }
+  return res.status(200).json({ message: 'OK', type: client.clientType });
 });
 
 router.post('/order/check/statuses', orderStatuses);
@@ -229,6 +229,15 @@ router.post(
 router.post('/get/awb', async (req, res, next) => {
   try {
     return await requestHandler(req, res, next, getAwb);
+  } catch (error) {
+    next(error);
+  }
+});
+
+//FUL
+router.post('/fulfillment/order/get/awb', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, fulGetAwb);
   } catch (error) {
     next(error);
   }

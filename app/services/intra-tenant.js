@@ -29,6 +29,7 @@ async function createOrder(req, res, next) {
       req.originalUrl = '/LM/order';
       req.body.orderCreationType = orderCreationType.API;
       req.body.orderType = orderType.DROP_SHIP;
+      req.body.orderStatus = 'CREATED';
       return await requestForwarder(req, res, next);
     }
   } catch (error) {

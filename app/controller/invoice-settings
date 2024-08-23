@@ -1,0 +1,67 @@
+const express = require('express');
+const { logger: log } = require('../utils/logger');
+const context = require('../utils/async-context');
+const { get } = require('../services').TenantService;
+const authorizeAuthenticate = require('../middlewares/security/authorize-authenticate');
+const Util = require('../utils/Util');
+const router = express.Router();
+
+router.get('/settings', authorizeAuthenticate, async (req, res, next) => {
+  try {
+    log.info('getting invoice settings');
+    const tenant = await get(context.get('db'));
+    const companyInfo = {
+      enCompanyName: tenant.dataValues.enCompanyName,
+      arCompanyName: tenant.dataValues.arCompanyName,
+      enCompanyAddress: tenant.dataValues.enCompanyAddress,
+      arCompanyAddress: tenant.dataValues.arCompanyAddress,
+      accountName: tenant.dataValues.accountName,
+      bankName: tenant.dataValues.bankName,
+      ibanNumber: tenant.dataValues.ibanNumber,
+      swiftCode: tenant.dataValues.swiftCode,
+      vatNumber: tenant.dataValues.vatNumber,
+    };
+
+    return Util.getOkRequest(companyInfo, 'invoice settings found', res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/settings', authorizeAuthenticate, async (req, res, next) => {
+  try {
+    log.info('updating invoice settings');
+    const {
+      enCompanyName,
+      arCompanyName,
+      enCompanyAddress,
+      arCompanyAddress,
+      accountName,
+      bankName,
+      ibanNumber,
+      swiftCode,
+      vatNumber,
+    } = req.body;
+
+    const tenant = await get(context.get('db'));
+
+    tenant.set({
+      enCompanyName,
+      arCompanyName,
+      enCompanyAddress,
+      arCompanyAddress,
+      accountName,
+      bankName,
+      ibanNumber,
+      swiftCode,
+      vatNumber,
+    });
+
+    await tenant.save();
+    return Util.getOkRequest(null, 'Invoice Settings updates', res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = router;

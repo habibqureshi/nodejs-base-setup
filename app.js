@@ -14,6 +14,7 @@ const {
   CacheController,
   DomainController,
   TenantSettingsController,
+  InvoiceSettingsController,
 } = require('./app/controller');
 
 const apiSpec = YAML.load('./app/docs/openapi.yaml');
@@ -106,6 +107,7 @@ app.use('/platform/woocommerce', async (req, res, next) => {
 });
 
 app.use('/tenant', TenantSettingsController);
+app.use('/invoice', InvoiceSettingsController);
 app.use(authorizeAuthenticate);
 app.use('/oauth', AuthController);
 app.use(requestLimiter);

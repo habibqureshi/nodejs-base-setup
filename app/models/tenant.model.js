@@ -62,6 +62,42 @@ const Tenant = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: true,
     },
+    enCompanyName: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    arCompanyName: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    enCompanyAddress: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    arCompanyAddress: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    accountName: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    bankName: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    ibanNumber: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    swiftCode: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    vatNumber: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
   },
   {
     underscored: true,

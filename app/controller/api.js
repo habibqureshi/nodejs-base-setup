@@ -63,7 +63,7 @@ router.post(['/webhook', '/webhook/'], async (req, res, next) => {
 });
 
 //FUL
-router.post(' ', async (req, res, next) => {
+router.post('/fulfilment/order', async (req, res, next) => {
   req.body.orderCreationType = orderCreationType.API;
   return await requestHandler(req, res, next, createFulfilmentOrder);
 });

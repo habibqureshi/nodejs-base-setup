@@ -23,7 +23,7 @@ const { createWebhook } = require('../services/webhook');
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
 const orderType = require('../enums/order-type');
-const { getClientByUser } = require('../services/client');
+const { getClientByUser, update } = require('../services/client');
 const { requestHandler } = require('../middlewares/request-handler');
 const { logger } = require('../utils/logger');
 const router = express.Router();
@@ -36,6 +36,8 @@ router.get('/check', async (req, res, next) => {
   if (client.tenantClient && client.tenantClient !== tenant)
     return Util.getBadRequest('client already in use');
 
+  const data = { tenantClient: tenant };
+  await update(client.id, data);
   return res.status(200).json({ message: 'OK', type: client.clientType });
 });
 

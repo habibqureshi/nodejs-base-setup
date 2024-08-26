@@ -28,7 +28,17 @@ async function getClientById(id) {
   }
 }
 
+async function update(id, data) {
+  logger.info('updating client');
+  try {
+    return await getConnection().Client.update(data, { where: id });
+  } catch (error) {
+    throw new Error('Failed to update client', error);
+  }
+}
+
 module.exports = {
   getClientByUser,
   getClientById,
+  update,
 };

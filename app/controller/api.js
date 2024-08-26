@@ -17,8 +17,8 @@ const {
   getShopifyStore,
   deleteShopifyStore,
 } = require('../services').ClientStoreService;
-const { createOrder: createIntraTenantOrder } =
-  require('../services').IntraTenantService;
+// const { createOrder: createIntraTenantOrder } =
+//   require('../services').IntraTenantService;
 const { createWebhook } = require('../services/webhook');
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
@@ -29,12 +29,23 @@ const { logger } = require('../utils/logger');
 const router = express.Router();
 
 router.get('/check', async (req, res, next) => {
+  const tenant = req.query.tenant;
+  if (!tenant) return Util.getBadRequest('invalid tenant');
   const client = await getClientByUser(req.user.currentUser.id);
-  if (!client) {
-    logger.info('client not found with user id', req.user.currentUser.id);
-    return Util.getBadRequest('cannot find client from userId');
-  }
+  if (!client) return Util.getBadRequest('cannot find client from userId');
+  if (client.tenantClient && client.tenantClient !== tenant)
+    return Util.getBadRequest('client already in use');
+
   return res.status(200).json({ message: 'OK', type: client.clientType });
+});
+
+router.put('/fulfilment/order/tenant', async (req, res, next) => {
+  req.originalUrl = req.originalUrl.replace(
+    '/api/fulfilment/order/tenant',
+    '/FUL/fulfilment/order/tenant'
+  );
+  logger.info(req.originalUrl);
+  return await requestHandler(req, res, next, requestForwarder);
 });
 
 router.post('/order/check/statuses', orderStatuses);
@@ -70,10 +81,14 @@ router.post('/product', async (req, res, next) => {
   return await requestHandler(req, res, next, validateUserAndCreateProduct);
 });
 
+router.put('/product/tenant', async (req, res, next) => {
+  req.originalUrl = req.originalUrl.replace(
+    '/api/product/tenant',
+    '/FUL/product/tenant'
+  );
+  logger.info('here: ', req.originalUrl);
 
-router.put('/product/tenant', async (req,res,next) => {
-  req.originalUrl = req.originalUrl.replace('/api/product/tenant', '/FUL/product/tenant');
-  return await requestHandler(req,res,next,requestForwarder);
+  return await requestHandler(req, res, next, requestForwarder);
 });
 
 //FUL
@@ -341,10 +356,10 @@ router.post(
   }
 );
 
-router.post('/create/order/for/tenant', async (req, res, next) => {
-  req.body.orderCreationType = orderCreationType.API;
-  return await requestHandler(req, res, next, createIntraTenantOrder);
-});
+// router.post('/create/order/for/tenant', async (req, res, next) => {
+//   req.body.orderCreationType = orderCreationType.API;
+//   return await requestHandler(req, res, next, createIntraTenantOrder);
+// });
 
 router.use('/**', async (req, res, next) => {
   try {

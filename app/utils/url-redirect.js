@@ -19,6 +19,11 @@ let urls = {
       backend: lastMileBackend,
       method: 'POST',
     },
+    '/fulfilment/order/tenant': {
+      originalUrl: '/fulfilment/order',
+      backend: fulfilmentBackend,
+      method: 'POST',
+    },
     '/product': {
       POST: {
         originalUrl: '/product',

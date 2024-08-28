@@ -5,7 +5,7 @@ const {
   cancelOrder,
   getAwb,
 } = require('../services').LastMileService;
-const { createOrder: createFulfilmentOrder } =
+const { createOrder: createFulfilmentOrder, fulGetAwb } =
   require('./../services').FulfilmentService;
 const { getCities, getCountries, orderStatuses } =
   require('../services').ApiService;
@@ -17,6 +17,8 @@ const {
   getShopifyStore,
   deleteShopifyStore,
 } = require('../services').ClientStoreService;
+const { createWebhook } = require('../services/webhook');
+const { getClientByUser, updateClient } = require('../services/client');
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
 const orderType = require('../enums/order-type');
@@ -25,7 +27,29 @@ const { logger } = require('../utils/logger');
 const router = express.Router();
 
 router.get('/check', async (req, res, next) => {
-  return res.status(200).json({ message: 'OK' });
+  const tenant = req.query.tenant;
+  if (!tenant) return Util.getBadRequest('invalid tenant');
+  const client = await getClientByUser(req.user.currentUser.id);
+  if (!client) return Util.getBadRequest('cannot find client from userId');
+  if (client.tenantClient && client.tenantClient !== tenant)
+    return Util.getBadRequest('client already in use');
+
+  const data = { tenantClient: tenant };
+  await updateClient(client.id, data);
+  return res.status(200).json({ message: 'OK', type: client.clientType });
+});
+
+router.post(['/webhook', '/webhook/'], async (req, res, next) => {
+  return await requestHandler(req, res, next, createWebhook);
+});
+
+router.put('/fulfilment/order/tenant', async (req, res, next) => {
+  req.originalUrl = req.originalUrl.replace(
+    '/api/fulfilment/order/tenant',
+    '/FUL/fulfilment/order/tenant'
+  );
+  logger.info(req.originalUrl);
+  return await requestHandler(req, res, next, requestForwarder);
 });
 
 router.post('/order/check/statuses', orderStatuses);
@@ -57,6 +81,14 @@ router.post('/product', async (req, res, next) => {
   return await requestHandler(req, res, next, validateUserAndCreateProduct);
 });
 
+router.put('/product/tenant', async (req, res, next) => {
+  req.originalUrl = req.originalUrl.replace(
+    '/api/product/tenant',
+    '/FUL/product/tenant'
+  );
+  return await requestHandler(req, res, next, requestForwarder);
+});
+
 //FUL
 router.get('/product', async (req, res, next) => {
   return await requestHandler(req, res, next, getProductList);
@@ -65,6 +97,15 @@ router.get('/product', async (req, res, next) => {
 //FUL
 router.post('/product/update', async (req, res, next) => {
   return await requestHandler(req, res, next, updateProduct);
+});
+
+//FUL
+router.post('/fulfillment/order/get/awb', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, fulGetAwb);
+  } catch (error) {
+    next(error);
+  }
 });
 
 //LM

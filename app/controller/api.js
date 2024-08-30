@@ -175,7 +175,7 @@ router.post(['/platform/oauth/zid'], async (req, res, next) => {
 });
 
 router.post(
-  ['/platform/salla/validate/and/integrate'],
+  '/platform/salla/validate/and/integrate',
   async (req, res, next) => {
     try {
       return await requestHandler(req, res, next, requestForwarder);

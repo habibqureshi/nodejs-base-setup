@@ -16,6 +16,17 @@ const create = async (tenant, transaction) => {
   return tenantCreated;
 };
 
+const updateByName = async (tenantData, tenantName, transaction) => {
+  log.info('Updating tenants with name', tenantName);
+  const opt = {};
+  if (transaction) opt.transaction = transaction;
+
+  return await Tenant.update(tenantData, {
+    where: { name: tenantName },
+    ...opt,
+  });
+};
+
 const update = async (tenant, tenantId, transaction) => {
   log.info('updating tenant to', tenant, 'by tenantId', tenantId);
   const opt = {};
@@ -25,4 +36,4 @@ const update = async (tenant, tenantId, transaction) => {
     { where: { tenantId }, ...opt }
   );
 };
-module.exports = { get, create, update };
+module.exports = { get, create, update, updateByName };

@@ -5,6 +5,7 @@ const { get } = require('../services').TenantService;
 const authorizeAuthenticate = require('../middlewares/security/authorize-authenticate');
 const Util = require('../utils/Util');
 const router = express.Router();
+const { updateByName } = require('../services').TenantService;
 
 router.get('/settings', authorizeAuthenticate, async (req, res, next) => {
   try {
@@ -30,35 +31,20 @@ router.get('/settings', authorizeAuthenticate, async (req, res, next) => {
 
 router.put('/settings', authorizeAuthenticate, async (req, res, next) => {
   try {
-    log.info('updating invoice settings');
-    const {
-      enCompanyName,
-      arCompanyName,
-      enCompanyAddress,
-      arCompanyAddress,
-      accountName,
-      bankName,
-      ibanNumber,
-      swiftCode,
-      vatNumber,
-    } = req.body;
+    log.info('Updating invoice settings');
 
     const tenant = await get(context.get('db'));
+    const tenantName = tenant.getDataValue('name');
 
-    tenant.set({
-      enCompanyName,
-      arCompanyName,
-      enCompanyAddress,
-      arCompanyAddress,
-      accountName,
-      bankName,
-      ibanNumber,
-      swiftCode,
-      vatNumber,
-    });
+    await updateByName(req.body, tenantName);
 
-    await tenant.save();
-    return Util.getOkRequest(null, 'Invoice Settings updates', res);
+    log.info(`Updated all tenants with name = ${tenantName}`);
+
+    return Util.getOkRequest(
+      null,
+      'Invoice settings updated for all matching tenants',
+      res
+    );
   } catch (error) {
     next(error);
   }

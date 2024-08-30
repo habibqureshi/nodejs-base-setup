@@ -211,7 +211,7 @@ router.post(['/platform/oauth/zid'], async (req, res, next) => {
 });
 
 router.post(
-  ['/platform/salla/validate/and/integrate'],
+  '/platform/salla/validate/and/integrate',
   async (req, res, next) => {
     try {
       return await requestHandler(req, res, next, requestForwarder);
@@ -221,19 +221,16 @@ router.post(
   }
 );
 
-router.post(
-  ['/platform/zid/validate/and/integrate'],
-  async (req, res, next) => {
-    try {
-      return await requestHandler(req, res, next, requestForwarder);
-    } catch (error) {
-      next(error);
-    }
+router.post('/platform/zid/validate/and/integrate', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, requestForwarder);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 //MAN
-router.post(['/platform/zid/auto/dispatching'], async (req, res, next) => {
+router.post('/platform/zid/auto/dispatching', async (req, res, next) => {
   try {
     return await requestHandler(req, res, next, requestForwarder);
   } catch (error) {

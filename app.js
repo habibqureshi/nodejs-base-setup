@@ -107,8 +107,8 @@ app.use('/platform/woocommerce', async (req, res, next) => {
 });
 
 app.use('/tenant', TenantSettingsController);
-app.use('/invoice', InvoiceSettingsController);
 app.use(authorizeAuthenticate);
+app.use('/invoice', InvoiceSettingsController);
 app.use('/oauth', AuthController);
 app.use(requestLimiter);
 app.use('/api', ApiController);

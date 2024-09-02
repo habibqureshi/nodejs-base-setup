@@ -47,7 +47,31 @@ async function fulfillmentBulk(req, res, next) {
   }
 }
 
+async function fulGetAwb(req, res, next) {
+  try {
+    req.originalUrl = '/FUL/fulfilment/order/get/awb/for/client';
+    if (req.user.currentUser.type === UserType.CLIENT) {
+      logger.info('CLIENT');
+      let userClient = await clientService.getClientByUser(
+        req.user.currentUser.id
+      );
+      if (!userClient) {
+        return Util.getBadRequest('cannot find client from userId');
+      }
+      req.body.client = {
+        id: userClient.id,
+        name: userClient.name,
+      };
+    }
+    return await requestForwarder(req, res, next);
+  } catch (error) {
+    logger.info(error);
+    return next(error);
+  }
+}
+
 module.exports = {
   createOrder,
   fulfillmentBulk,
+  fulGetAwb,
 };

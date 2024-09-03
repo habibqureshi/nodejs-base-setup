@@ -1,5 +1,5 @@
 const managementBackEnd = process.env.MANAGEMENT_BACKEND;
-const lastMileBackend = 'http://localhost:10000';
+const lastMileBackend = process.env.LATS_MILE_BACKEND;
 const fulfilmentBackend = process.env.FULFILLMENT_BACKEND;
 
 let urls = {

@@ -28,8 +28,13 @@ module.exports = (sequelize, DataTypes) => {
       },
       tenantClient: {
         type: DataTypes.STRING(45),
+<<<<<<< HEAD
         allowNull: true,
       },
+=======
+        allowNull: true
+      }
+>>>>>>> 584d2141941c144e8cd3b735477f945aa5c78e9e
     },
     {
       underscored: true,

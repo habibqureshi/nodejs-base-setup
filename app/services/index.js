@@ -9,6 +9,7 @@ const UserService = require('./users');
 const ClientStoreService = require('./client-store');
 const DomainService = require('./domain');
 const TenantService = require('./tenant');
+const IntraTenantService = require('./intra-tenant');
 module.exports = {
   AuthService,
   UsersService,
@@ -21,4 +22,5 @@ module.exports = {
   ClientStoreService,
   DomainService,
   TenantService,
+  IntraTenantService,
 };

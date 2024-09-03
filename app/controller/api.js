@@ -17,11 +17,18 @@ const {
   getShopifyStore,
   deleteShopifyStore,
 } = require('../services').ClientStoreService;
+<<<<<<< HEAD
 const { createWebhook } = require('../services/webhook');
 const { getClientByUser, updateClient } = require('../services/client');
+=======
+// const { createOrder: createIntraTenantOrder } =
+//   require('../services').IntraTenantService;
+const { createWebhook } = require('../services/webhook');
+>>>>>>> 584d2141941c144e8cd3b735477f945aa5c78e9e
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
 const orderType = require('../enums/order-type');
+const { getClientByUser, update } = require('../services/client');
 const { requestHandler } = require('../middlewares/request-handler');
 const { logger } = require('../utils/logger');
 const router = express.Router();
@@ -35,6 +42,7 @@ router.get('/check', async (req, res, next) => {
     return Util.getBadRequest('client already in use');
 
   const data = { tenantClient: tenant };
+<<<<<<< HEAD
   await updateClient(client.id, data);
   return res.status(200).json({ message: 'OK', type: client.clientType });
 });
@@ -43,6 +51,12 @@ router.post(['/webhook', '/webhook/'], async (req, res, next) => {
   return await requestHandler(req, res, next, createWebhook);
 });
 
+=======
+  await update(client.id, data);
+  return res.status(200).json({ message: 'OK', type: client.clientType });
+});
+
+>>>>>>> 584d2141941c144e8cd3b735477f945aa5c78e9e
 router.put('/fulfilment/order/tenant', async (req, res, next) => {
   req.originalUrl = req.originalUrl.replace(
     '/api/fulfilment/order/tenant',
@@ -60,6 +74,10 @@ router.post('/get/all/cities', getCities);
 router.post(['/create/order', '/create/order/'], async (req, res, next) => {
   req.body.orderCreationType = orderCreationType.API;
   return await requestHandler(req, res, next, createLastMileOrder);
+});
+
+router.post(['/webhook', '/webhook/'], async (req, res, next) => {
+  return await requestHandler(req, res, next, createWebhook);
 });
 
 //FUL
@@ -86,6 +104,11 @@ router.put('/product/tenant', async (req, res, next) => {
     '/api/product/tenant',
     '/FUL/product/tenant'
   );
+<<<<<<< HEAD
+=======
+  logger.info('here: ', req.originalUrl);
+
+>>>>>>> 584d2141941c144e8cd3b735477f945aa5c78e9e
   return await requestHandler(req, res, next, requestForwarder);
 });
 
@@ -270,6 +293,15 @@ router.post('/get/awb', async (req, res, next) => {
   }
 });
 
+//FUL
+router.post('/fulfillment/order/get/awb', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, fulGetAwb);
+  } catch (error) {
+    next(error);
+  }
+});
+
 //LM
 router.post(['/order/track', '/order/track/'], async (req, res, next) => {
   try {
@@ -361,6 +393,11 @@ router.post(
     return await requestHandler(req, res, next, requestForwarder);
   }
 );
+
+// router.post('/create/order/for/tenant', async (req, res, next) => {
+//   req.body.orderCreationType = orderCreationType.API;
+//   return await requestHandler(req, res, next, createIntraTenantOrder);
+// });
 
 router.use('/**', async (req, res, next) => {
   try {

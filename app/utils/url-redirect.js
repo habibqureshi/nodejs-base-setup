@@ -56,6 +56,11 @@ let urls = {
       backend: managementBackEnd,
       method: 'POST',
     },
+    '/fulfilment/order/tenant': {
+      originalUrl: '/fulfilment/order',
+      backend: fulfilmentBackend,
+      method: 'POST',
+    },
     '/request/quote': {
       originalUrl: '/management/request/quote',
       backend: managementBackEnd,

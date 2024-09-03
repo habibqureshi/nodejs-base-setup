@@ -28,7 +28,7 @@ async function getClientById(id) {
   }
 }
 
-async function updateClient(id, data) {
+async function update(id, data) {
   logger.info('updating client');
   try {
     return await getConnection().Client.update(data, { where: { id } });
@@ -41,5 +41,5 @@ async function updateClient(id, data) {
 module.exports = {
   getClientByUser,
   getClientById,
-  updateClient,
+  update,
 };

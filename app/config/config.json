@@ -3,7 +3,7 @@
     "username": "root",
     "password": "C@UI75^[__#ht\"I4",
     "database": "common",
-    "host": "10.108.224.5",
+    "host": "35.239.213.50",
     "dialect": "mysql",
     "port": "3306",
     "pool": {

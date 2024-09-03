@@ -17,14 +17,9 @@ const {
   getShopifyStore,
   deleteShopifyStore,
 } = require('../services').ClientStoreService;
-<<<<<<< HEAD
-const { createWebhook } = require('../services/webhook');
-const { getClientByUser, updateClient } = require('../services/client');
-=======
 // const { createOrder: createIntraTenantOrder } =
 //   require('../services').IntraTenantService;
 const { createWebhook } = require('../services/webhook');
->>>>>>> 584d2141941c144e8cd3b735477f945aa5c78e9e
 const { urls } = require('../utils/url-redirect');
 const orderCreationType = require('../enums/order-creation-type');
 const orderType = require('../enums/order-type');
@@ -42,21 +37,10 @@ router.get('/check', async (req, res, next) => {
     return Util.getBadRequest('client already in use');
 
   const data = { tenantClient: tenant };
-<<<<<<< HEAD
-  await updateClient(client.id, data);
-  return res.status(200).json({ message: 'OK', type: client.clientType });
-});
-
-router.post(['/webhook', '/webhook/'], async (req, res, next) => {
-  return await requestHandler(req, res, next, createWebhook);
-});
-
-=======
   await update(client.id, data);
   return res.status(200).json({ message: 'OK', type: client.clientType });
 });
 
->>>>>>> 584d2141941c144e8cd3b735477f945aa5c78e9e
 router.put('/fulfilment/order/tenant', async (req, res, next) => {
   req.originalUrl = req.originalUrl.replace(
     '/api/fulfilment/order/tenant',
@@ -104,11 +88,8 @@ router.put('/product/tenant', async (req, res, next) => {
     '/api/product/tenant',
     '/FUL/product/tenant'
   );
-<<<<<<< HEAD
-=======
   logger.info('here: ', req.originalUrl);
 
->>>>>>> 584d2141941c144e8cd3b735477f945aa5c78e9e
   return await requestHandler(req, res, next, requestForwarder);
 });
 

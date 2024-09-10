@@ -52,7 +52,6 @@ router.put('/fulfilment/order/tenant', async (req, res, next) => {
           '/api/fulfilment/order/tenant',
           '/FUL/fulfilment/order/tenant'
         );
-
   logger.info(req.originalUrl);
   return await requestHandler(req, res, next, requestForwarder);
 });
@@ -108,6 +107,15 @@ router.get('/product', async (req, res, next) => {
 //FUL
 router.post('/product/update', async (req, res, next) => {
   return await requestHandler(req, res, next, updateProduct);
+});
+
+//FUL
+router.post('/fulfillment/order/get/awb', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, fulGetAwb);
+  } catch (error) {
+    next(error);
+  }
 });
 
 //LM

@@ -42,10 +42,17 @@ router.get('/check', async (req, res, next) => {
 });
 
 router.put('/fulfilment/order/tenant', async (req, res, next) => {
-  req.originalUrl = req.originalUrl.replace(
-    '/api/fulfilment/order/tenant',
-    '/FUL/fulfilment/order/tenant'
-  );
+  req.originalUrl =
+    req.query.service === 'lastmile'
+      ? req.originalUrl.replace(
+          '/api/fulfilment/order/tenant',
+          '/LM/order/tenant'
+        )
+      : req.originalUrl.replace(
+          '/api/fulfilment/order/tenant',
+          '/FUL/fulfilment/order/tenant'
+        );
+
   logger.info(req.originalUrl);
   return await requestHandler(req, res, next, requestForwarder);
 });

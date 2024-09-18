@@ -70,6 +70,15 @@ router.post('/fulfilment/order', async (req, res, next) => {
   return await requestHandler(req, res, next, createFulfilmentOrder);
 });
 
+//FUL
+router.post('/status/check', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, requestForwarder);
+  } catch (error) {
+    next(error);
+  }
+});
+
 //LM
 router.post('/create/reverse/order', async (req, res, next) => {
   req.body.orderCreationType = orderCreationType.API;

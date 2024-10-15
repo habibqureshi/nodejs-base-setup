@@ -219,6 +219,15 @@ router.post(['/platform/oauth/zid'], async (req, res, next) => {
   }
 });
 
+//MAN
+router.delete(['/platform/zid'], async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, requestForwarder);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post(
   '/platform/salla/validate/and/integrate',
   async (req, res, next) => {

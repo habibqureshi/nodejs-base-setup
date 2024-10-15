@@ -205,6 +205,10 @@ let urls = {
       originalUrl: '/platform/oauth/zid',
       backend: managementBackEnd,
     },
+    '/platform/zid': {
+      originalUrl: '/platform/zid',
+      backend: managementBackEnd,
+    },
     '/platform/salla/validate/and/integrate': {
       originalUrl: '/platform/salla/validate/and/integrate',
       backend: managementBackEnd,

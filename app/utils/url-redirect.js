@@ -230,14 +230,6 @@ let urls = {
       originalUrl: '/platform/salla/token',
       backend: managementBackEnd,
     },
-    '/platform/salla/validate/and/integrate': {
-      originalUrl: '/platform/salla/validate/and/integrate',
-      backend: managementBackEnd,
-    },
-    '/platform/salla/validate/and/integrate': {
-      originalUrl: '/platform/salla/validate/and/integrate',
-      backend: managementBackEnd,
-    },
     '/status/check': {
       originalUrl: '/fulfilment/order/status/check',
       backend: fulfilmentBackend,

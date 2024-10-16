@@ -26,6 +26,7 @@ const orderType = require('../enums/order-type');
 const { getClientByUser, update } = require('../services/client');
 const { requestHandler } = require('../middlewares/request-handler');
 const { logger } = require('../utils/logger');
+const Util = require('../utils/Util');
 const router = express.Router();
 
 router.get('/check', async (req, res, next) => {

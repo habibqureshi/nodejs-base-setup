@@ -58,8 +58,8 @@ const attach = async (req, res, next) => {
     }
     try {
       log.info('validating dns record');
-      const txtRecord = await dns.resolveTxt(domain.record);
-      validateDnsRecord(domain.content, txtRecord);
+      const cnameRecord = await dns.resolveCname(domain.record);
+      validateDnsRecord(domain.tenant, cnameRecord);
     } catch (error) {
       log.error('error while validating domain', error);
       return Util.getBadRequest('Please verify dns record', res);

@@ -26,6 +26,7 @@ const orderType = require('../enums/order-type');
 const { getClientByUser, update } = require('../services/client');
 const { requestHandler } = require('../middlewares/request-handler');
 const { logger } = require('../utils/logger');
+const Util = require('../utils/Util');
 const router = express.Router();
 
 router.get('/check', async (req, res, next) => {
@@ -42,10 +43,16 @@ router.get('/check', async (req, res, next) => {
 });
 
 router.put('/fulfilment/order/tenant', async (req, res, next) => {
-  req.originalUrl = req.originalUrl.replace(
-    '/api/fulfilment/order/tenant',
-    '/FUL/fulfilment/order/tenant'
-  );
+  req.originalUrl =
+    req.query.service === 'lastmile'
+      ? req.originalUrl.replace(
+          '/api/fulfilment/order/tenant',
+          '/LM/order/tenant'
+        )
+      : req.originalUrl.replace(
+          '/api/fulfilment/order/tenant',
+          '/FUL/fulfilment/order/tenant'
+        );
   logger.info(req.originalUrl);
   return await requestHandler(req, res, next, requestForwarder);
 });
@@ -110,6 +117,15 @@ router.get('/product', async (req, res, next) => {
 //FUL
 router.post('/product/update', async (req, res, next) => {
   return await requestHandler(req, res, next, updateProduct);
+});
+
+//FUL
+router.post('/fulfillment/order/get/awb', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, fulGetAwb);
+  } catch (error) {
+    next(error);
+  }
 });
 
 //LM

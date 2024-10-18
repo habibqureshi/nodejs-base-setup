@@ -98,6 +98,10 @@ const Tenant = sequelize.define(
       type: DataTypes.STRING(45),
       allowNull: true,
     },
+    currencyCode: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
   },
   {
     underscored: true,

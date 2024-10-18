@@ -21,6 +21,7 @@ router.get('/settings', authorizeAuthenticate, async (req, res, next) => {
       ibanNumber: tenant.dataValues.ibanNumber,
       swiftCode: tenant.dataValues.swiftCode,
       vatNumber: tenant.dataValues.vatNumber,
+      currencyCode: tenant.dataValues.currencyCode,
     };
 
     return Util.getOkRequest(companyInfo, 'invoice settings found', res);

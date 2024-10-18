@@ -56,14 +56,14 @@ const attach = async (req, res, next) => {
       log.info('domain already attached!', domain.record);
       return Util.getBadRequest('domain already attached', res);
     }
-    // try {
-    //   log.info('validating dns record');
-    //   const txtRecord = await dns.resolveTxt(domain.record);
-    //   validateDnsRecord(domain.content, txtRecord);
-    // } catch (error) {
-    //   log.error('error while validating domain', error);
-    //   return Util.getBadRequest('Please verify dns record', res);
-    // }
+    try {
+      log.info('validating dns record');
+      const cnameRecord = await dns.resolveCname(domain.record);
+      validateDnsRecord(domain.tenant, cnameRecord);
+    } catch (error) {
+      log.error('error while validating domain', error);
+      return Util.getBadRequest('Please verify dns record', res);
+    }
     log.info('valid dns record');
 
     let tenant = await TenantService.get(context.get('db'));

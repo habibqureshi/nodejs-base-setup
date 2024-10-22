@@ -210,6 +210,10 @@ let urls = {
       originalUrl: '/platform/oauth/zid',
       backend: managementBackEnd,
     },
+    '/platform/zid': {
+      originalUrl: '/platform/zid',
+      backend: managementBackEnd,
+    },
     '/platform/salla/validate/and/integrate': {
       originalUrl: '/platform/salla/validate/and/integrate',
       backend: managementBackEnd,
@@ -229,6 +233,10 @@ let urls = {
     '/platform/salla/token': {
       originalUrl: '/platform/salla/token',
       backend: managementBackEnd,
+    },
+    '/status/check': {
+      originalUrl: '/fulfilment/order/status/check',
+      backend: fulfilmentBackend,
     },
     '/status/check': {
       originalUrl: '/fulfilment/order/status/check',

@@ -16,7 +16,7 @@ const kubeConfig = new KubeConfig();
 kubeConfig.loadFromCluster();
 const k8sApi = kubeConfig.makeApiClient(NetworkingV1Api);
 const namespace = process.env.POD_NAMESPACE,
-  ingressName = 'external';
+  ingressName = process.env.INGRESS_NAME;
 
 const AddSchema = Joi.object({
   host: Joi.string().domain().required(),

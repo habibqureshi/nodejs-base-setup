@@ -58,9 +58,9 @@ app.use(morgan(MorganFormat.AFTER, false, 'request ends'));
 app.use('/health', (req, res) => {
   res.status(200).send("{status:'UP'}");
 });
-(async () => {
-  await initializeTenants();
-})();
+// (async () => {
+//   await initializeTenants();
+// })();
 app.use(async (req, res, next) => {
   let host =
     req.query['x-host'] ||

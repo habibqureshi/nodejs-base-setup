@@ -16,7 +16,7 @@ const kubeConfig = new KubeConfig();
 kubeConfig.loadFromCluster();
 const k8sApi = kubeConfig.makeApiClient(NetworkingV1Api);
 const namespace = process.env.POD_NAMESPACE,
-  ingressName = 'external';
+  ingressName = process.env.INGRESS_NAME;
 
 const AddSchema = Joi.object({
   host: Joi.string().domain().required(),
@@ -59,7 +59,7 @@ const attach = async (req, res, next) => {
     try {
       log.info('validating dns record');
       const cnameRecord = await dns.resolveCname(domain.record);
-      validateDnsRecord(domain.tenant, cnameRecord);
+      validateCnameRecord(domain.tenant, cnameRecord);
     } catch (error) {
       log.error('error while validating domain', error);
       return Util.getBadRequest('Please verify dns record', res);
@@ -160,6 +160,14 @@ const validateDnsRecord = (content, textRecords) => {
   const valid = tokens.some((token) => token === content);
   if (!valid) {
     log.info('token not matched from', textRecords);
+    throw new Error('token not validated');
+  }
+};
+
+const validateCnameRecord = (tenant, cnameRecords) => {
+  const valid = cnameRecords.some((token) => token === tenant);
+  if (!valid) {
+    log.info('cname not matched from', cnameRecords);
     throw new Error('token not validated');
   }
 };

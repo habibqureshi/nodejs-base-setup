@@ -90,7 +90,7 @@ app.use('/docs', swaggerUi.serve, async (req, res, next) => {
   const tenant = await TenantService.get(context.get('db'));
   apiSpec.servers = [
     {
-      url: `https//${tenant.chinaDomain || context.get('db')}`,
+      url: `https://${tenant.chinaDomain || context.get('db')}`,
     },
   ];
   logger.info('servers', apiSpec.servers);

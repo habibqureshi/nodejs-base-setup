@@ -242,6 +242,18 @@ let urls = {
       originalUrl: '/fulfilment/order/status/check',
       backend: fulfilmentBackend,
     },
+    '/replenishment': {
+      originalUrl: '/replenishment',
+      backend: fulfilmentBackend,
+    },
+    '/replenishment/get': {
+      originalUrl: '/replenishment/get',
+      backend: fulfilmentBackend,
+    },
+    '/replenishment/generate/pdf': {
+      originalUrl: '/replenishment/generate/pdf',
+      backend: fulfilmentBackend,
+    },
   },
   LM: {
     '/**': {

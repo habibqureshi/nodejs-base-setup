@@ -86,6 +86,31 @@ router.post('/status/check', async (req, res, next) => {
   }
 });
 
+//FUL
+router.post('/replenishment', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, requestForwarder);
+  } catch (error) {
+    next(error);
+  }
+});
+//FUL
+router.post('/replenishment/get', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, requestForwarder);
+  } catch (error) {
+    next(error);
+  }
+});
+//FUL
+router.post('/replenishment/generate/pdf', async (req, res, next) => {
+  try {
+    return await requestHandler(req, res, next, requestForwarder);
+  } catch (error) {
+    next(error);
+  }
+});
+
 //LM
 router.post('/create/reverse/order', async (req, res, next) => {
   req.body.orderCreationType = orderCreationType.API;

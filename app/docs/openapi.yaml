@@ -778,13 +778,13 @@ paths:
           required: true
           schema:
             type: string
-            example: 2022-03-1
+            example: '2022-03-01'
         - in: query
           name: to
           required: true
           schema:
             type: string
-            example: 2022-04-1
+            example: '2022-04-01'
         - in: query
           name: id
           required: false
@@ -1504,13 +1504,13 @@ paths:
           required: true
           schema:
             type: string
-            example: 2022-03-1
+            example: '2022-03-01'
         - in: query
           name: to
           required: true
           schema:
             type: string
-            example: 2022-04-1
+            example: '2022-04-01'
         - in: query
           name: id
           required: false
@@ -1614,6 +1614,274 @@ paths:
                     createdAt:
                       type: integer
                       example: '2024-09-19 06:59:09'
+  /api/replenishment:
+    post:
+      tags:
+        - Fulfilment
+      summary: Create Replenishment
+      description: create Replenishment
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: '#/paths/~1api~1replenishment/post/responses/200/content/application~1json/schema/data'
+                data:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                      example: 1
+                    totalCreated:
+                      type: integer
+                      example: 1
+                    totalFailed:
+                      type: integer
+                      example: 0
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1replenishment/post/responses/200/content/application~1json/schema/orderrs'
+                orderrs:
+                  type: object
+                  required:
+                    - orders
+                    - orderNumber
+                    - orderTrackingNumber
+                    - status
+                    - msg
+                    - order
+                    - type
+                  properties:
+                    orderNumber:
+                      type: string
+                      example: SKU0000000001
+                    orderTrackingNumber:
+                      type: string
+                      example: null
+                    status:
+                      type: string
+                      example: success
+                    msg:
+                      type: string
+                      example: product added with quantity 1
+                    order:
+                      type: string
+                      example: null
+                    type:
+                      type: string
+                      example: null
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Error While Adding Replenishment
+                  httpStatus:
+                    type: string
+                    example: BAD_REQUEST
+                  data:
+                    type: string
+                    example: null
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduledDate:
+                  type: string
+                  example: '2024-11-29 00:00:00'
+                document1:
+                  type: string
+                  example: 'https://gogglestorag/api/.png'
+                document2:
+                  type: string
+                  example: 'https://gogglestorag/api/.png'
+                document3:
+                  type: string
+                  example: 'https://gogglestorag/api/.png'
+                items:
+                  $ref: '#/paths/~1api~1replenishment/post/requestBody/content/application~1json/schema/items'
+              items:
+                type: array
+                items:
+                  $ref: '#/paths/~1api~1replenishment/post/requestBody/content/application~1json/schema/by'
+              by:
+                type: object
+                required:
+                  - trackingSku
+                  - quantity
+                properties:
+                  trackingSku:
+                    type: string
+                    example: SKU0000000001
+                  quantity:
+                    type: integer
+                    example: 1
+        description: Replenishment Create
+  /api/replenishment/get:
+    post:
+      tags:
+        - Fulfilment
+      summary: Get All Replenishments
+      parameters:
+        - in: query
+          name: timezone
+          description: 'Get the Timezone from this URL https://timezonedb.com/time-zones'
+          required: true
+          schema:
+            type: string
+            example: Asia/Riyadh
+        - in: query
+          name: size
+          description: 'if size is not defined by default is 10, we have these sizes available 10,20,50 and 100'
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - in: query
+          name: id
+          required: false
+          description: this is only required for pagination lastid of sku and   &next=next  for next page          for  previous page next=pre
+          schema:
+            type: string
+            example: lastid(100) &next=next  for next page    for  previous page next=pre
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/paths/~1api~1replenishment~1get/post/responses/200/content/application~1json/schema/data'
+                  message:
+                    type: string
+                    example: null
+                  httpStatus:
+                    type: string
+                    example: OK
+                  status:
+                    type: string
+                    example: success
+                data:
+                  type: object
+                  properties:
+                    count:
+                      type: number
+                      example: 10
+                    replenishmentOrders:
+                      type: string
+                      example: null
+                    Products:
+                      type: array
+                      items:
+                        $ref: '#/paths/~1api~1replenishment~1get/post/responses/200/content/application~1json/schema/Products'
+                Products:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 1
+                    replenishmentId:
+                      type: string
+                      example: REP0000000055
+                    clientName:
+                      type: string
+                      example: Test
+                    status:
+                      type: string
+                      example: CREATED
+                    totalQty:
+                      type: number
+                      example: 2
+                    receivedBy:
+                      type: string
+                      example: test
+                    createdAt:
+                      type: string
+                      example: '2024-11-21 17:56:11.0'
+                    updatedAt:
+                      type: string
+                      example: '2024-11-21 17:56:11.0'
+                    scheduledDate:
+                      type: string
+                      example: '2024-11-30'
+                    enable:
+                      type: string
+                      example: true
+                    deleted:
+                      type: string
+                      example: false
+                    totalMissing:
+                      type: number
+                      example: 1
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Fail
+                  message:
+                    type: string
+                    example: No Data Found
+                  httpStatus:
+                    type: string
+                    example: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: Get All Replenishments
+  /api/replenishment/generate/pdf:
+    post:
+      tags:
+        - Fulfilment
+      summary: AWB
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+            example: REP0000000008
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  AWB:
+                    type: string
+                    example: Replenishment PDF DOWNLOAD
 components:
   securitySchemes:
     BasicAuth:

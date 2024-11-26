@@ -404,7 +404,7 @@ router.post('/shopify/fulfilment/order', async (req, res, next) => {
 });
 
 router.post(
-  ['/create/store', 'create/shopify/store'],
+  ['/create/store', '/create/shopify/store'],
   async (req, res, next) => {
     return await requestHandler(req, res, next, validateAndCreateShopifyStore);
   }

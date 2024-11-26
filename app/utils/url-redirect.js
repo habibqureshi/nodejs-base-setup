@@ -161,7 +161,7 @@ let urls = {
       backend: managementBackEnd,
       method: 'POST',
     },
-    'create/shopify/store': {
+    '/create/shopify/store': {
       originalUrl: '/management/create/shopify/store',
       backend: managementBackEnd,
       method: 'POST',

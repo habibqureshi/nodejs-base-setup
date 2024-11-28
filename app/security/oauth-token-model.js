@@ -120,6 +120,7 @@ module.exports = {
         logger.info('refresh token not found');
         callback('Refresh token not found', null);
       }
+      token.user = token.User;
       context.set('user', token.user.username);
       logger.info('token refreshed for user', token.user.username);
       const returningToken = {

@@ -61,14 +61,14 @@ const getUserIDFromBearerToken = async (bearerToken) => {
 };
 
 const getRefreshToken = async (refreshToken) => {
-  return getConnection().AccessToken.findOne({
+  const { AccessToken, User, OauthClientDetails, Roles, Permission } =
+    getConnection();
+  return AccessToken.findOne({
     where: { refreshToken },
     include: [
       {
-        model: getConnection().User,
-        include: [
-          { model: Roles, include: [{ model: getConnection().Permission }] },
-        ],
+        model: User,
+        include: [{ model: Roles, include: [{ model: Permission }] }],
       },
       {
         model: OauthClientDetails,

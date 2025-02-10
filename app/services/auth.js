@@ -1,9 +1,5 @@
 // const tenant = require('../middlewares/tenant');
-const { getConnection } = require('../middlewares/tenant-manager');
 const { AccessToken, Permission, User, Roles } = require('../models');
-const context = require('../utils/async-context');
-
-const { OauthClientDetails } = require('../models').OauthClientDetails;
 const { logger } = require('../utils/logger');
 
 const login = (req, res) => {
@@ -18,7 +14,7 @@ const saveAccessToken = async (token, userId, clientId) => {
     )} user id is ${userId} client id is ${clientId}`
   );
   logger.info('expire time', token.accessTokenExpiresAt.getTime());
-  return await getConnection().AccessToken.upsert(
+  return await AccessToken.upsert(
     {
       accessToken: token.accessToken,
       refreshToken: token.refreshToken,
@@ -34,30 +30,23 @@ const saveAccessToken = async (token, userId, clientId) => {
 };
 
 const getUserIDFromBearerToken = async (bearerToken) => {
-  const token = await getConnection().AccessToken.findOne({
+  const token = await AccessToken.findOne({
     where: {
       accessToken: bearerToken,
     },
     include: [
       {
-        model: getConnection().User,
+        model: User,
         include: [
           {
-            model: getConnection().Roles,
-            include: [{ model: getConnection().Permission }],
-          },
-          {
-            model: getConnection().WareHouse,
-          },
-          {
-            model: getConnection().Client,
-            attributes: ['id'],
+            model: Roles,
+            include: [{ model: Permission }],
           },
         ],
       },
     ],
   });
-  return token !== null ? token : null;
+  return token;
 };
 
 const getRefreshToken = async (refreshToken) => {

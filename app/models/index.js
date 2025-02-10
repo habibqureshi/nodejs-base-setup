@@ -1,14 +1,24 @@
-const User = require('./user.model');
-const Tier = require('./tier.model');
-const City = require('./city.model');
-const Country = require('./country.model');
-const Permission = require('./permission.model');
-const Roles = require('./roles.model');
-const AccessToken = require('./access_token.model');
-const OauthClientDetails = require('./oauth_client_details.model');
-const ClientStore = require('./client_store.model');
-const Client = require('./client.model');
-const Tenant = require('./tenant.model');
+const db = require('../database');
+const Sequelize = db.Sequelize;
+const sequelize = db.sequelize;
+const User = require('./user.model')(sequelize, Sequelize.DataTypes);
+const Permission = require('./permission.model')(
+  sequelize,
+  Sequelize.DataTypes
+);
+const Roles = require('./roles.model')(sequelize, Sequelize.DataTypes);
+const AccessToken = require('./access_token.model')(
+  sequelize,
+  Sequelize.DataTypes
+);
+const OauthClientDetails = require('./oauth_client_details.model')(
+  sequelize,
+  Sequelize.DataTypes
+);
+// defining association
+User.associate({ Roles, AccessToken });
+Roles.associate({ Permission, User });
+AccessToken.associate({ User });
 
 // AccessToken.belongsTo(User, { targetKey: 'id' });
 // AccessToken.belongsTo(OauthClientDetails, {
@@ -50,14 +60,8 @@ const Tenant = require('./tenant.model');
 
 module.exports = {
   User,
-  Tier,
-  City,
-  Country,
   Permission,
   Roles,
-  Client,
-  ClientStore,
   AccessToken,
   OauthClientDetails,
-  Tenant,
 };

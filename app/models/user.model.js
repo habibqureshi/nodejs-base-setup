@@ -1,30 +1,12 @@
 const bcrypt = require('bcrypt');
-const UserType = require('../enums/UserType');
-
 ('use strict');
 const { Model } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      User.belongsTo(models.City, {
-        foreignKey: {
-          /* use this like `sequelize.define(...)` */
-          allowNull: false,
-          defaultValue: 1,
-        },
-      });
       User.belongsToMany(models.Roles, {
         through: 'user_roles',
-        foreignKey: 'user_id',
-        timestamps: false,
-      });
-      User.belongsToMany(models.WareHouse, {
-        through: 'warehouse_users',
-        foreignKey: 'user_id',
-        timestamps: false,
-      });
-      User.belongsToMany(models.Client, {
-        through: 'client_users',
         foreignKey: 'user_id',
         timestamps: false,
       });
@@ -58,29 +40,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      plainPassword: {
-        type: DataTypes.STRING(100),
-      },
-      birthday: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
+
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         isEmail: true,
-      },
-      contact: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      address: {
-        type: DataTypes.STRING,
-      },
-      type: {
-        type: DataTypes.ENUM,
-        values: Object.values(UserType),
-        defaultValue: UserType.EMPLOY,
       },
       enable: {
         type: DataTypes.BOOLEAN,
@@ -89,9 +53,6 @@ module.exports = (sequelize, DataTypes) => {
       deleted: {
         type: DataTypes.BOOLEAN,
         default: false,
-      },
-      cnic: {
-        type: DataTypes.STRING,
       },
     },
     {
@@ -112,5 +73,5 @@ module.exports = (sequelize, DataTypes) => {
 
 async function hashPassword(user, options) {
   if (!user.changed('plainPassword')) return 0;
-  user.password = user !== '' ? bcrypt.hashSync(user.password, 10) : '';
+  user.password = user !== '' ? bcrypt.hashSync(user.password, 12) : '';
 }

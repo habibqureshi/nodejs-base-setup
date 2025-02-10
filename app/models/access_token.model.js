@@ -7,11 +7,6 @@ module.exports = (sequelize, DataTypes) => {
         targetKey: 'id',
         foreignKey: 'user_id',
       });
-      AccessToken.belongsTo(models.OauthClientDetails, {
-        targetKey: 'clientId',
-        foreignKey: 'oauth_client_details_id',
-        as: 'client',
-      });
     }
   }
   AccessToken.init(

@@ -1,65 +1,54 @@
-const { Roles, Permission, User, WareHouse } = require('../models');
+const { Roles, Permission, User } = require('../models');
 const bcrypt = require('bcrypt');
-const dbRepo = require('../models/db_repo');
-const context = require('../utils/async-context');
-const { getConnection } = require('../middlewares/tenant-manager');
 const { logger } = require('../utils/logger');
 
-const fetchUserForLogin = async (username, password, callback) => {
-  const { User, Roles, Permission, WareHouse } = getConnection();
-  const user = await User.findOne({
-    include: [
-      // { model: dbRepo[dbKey].Roles, include: [dbRepo[dbKey].Permission] },
-      {
-        model: Roles,
-        attributes: ['id'],
-        include: [
-          {
-            model: Permission,
-            attributes: ['name'],
-          },
-        ],
-      },
-      {
-        model: WareHouse,
-        attributes: ['id', 'name'],
-      },
-    ],
-
-    where: {
-      username,
-    },
-    // raw: true,
-    nest: true,
-  });
+const fetchUserForLogin = async (username, password) => {
   try {
-    if (
-      user != null &&
-      (await new Promise((resolve, reject) => {
-        bcrypt.compare(password, user.password, (err, result) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        });
-      }))
-    ) {
-      // const validPassword = await bcrypt.compare(password, user.password);
-      // callback(false, validPassword ? user : null);
+    // Fetch user and their roles with permissions
+    const user = await User.findOne({
+      include: [
+        {
+          model: Roles,
+          attributes: ['id'],
+          include: [
+            {
+              model: Permission,
+              attributes: ['name'],
+            },
+          ],
+        },
+      ],
+      where: { username },
+      nest: true, // Ensures nested objects
+    });
 
-      return user;
-    } else {
+    // If no user found, return null
+    if (!user) {
+      logger.warn(`User not found for username: ${username}`);
       return null;
-      // callback(false, null);
     }
+
+    // Compare the provided password with the stored hash
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      logger.warn(`Invalid password for username: ${username}`);
+      return null;
+    }
+
+    // User authentication successful
+    logger.info(`User successfully authenticated: ${username}`);
+    return user;
   } catch (error) {
-    logger.error(error);
+    // Log the error and rethrow
+    logger.error('Error fetching user for login:', error);
+    throw error;
   }
 };
 
+
 const fetchUserWithUsername = async (username) => {
-  const { User, Roles, Permission, WareHouse } = getConnection();
+  logger.info(typeof User);
   return await User.findOne({
     include: [
       {
@@ -71,10 +60,6 @@ const fetchUserWithUsername = async (username) => {
             attributes: ['name', 'endpoint'],
           },
         ],
-      },
-      {
-        model: WareHouse,
-        attributes: ['id', 'name'],
       },
     ],
 

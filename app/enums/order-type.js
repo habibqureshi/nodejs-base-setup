@@ -1,5 +1,0 @@
-module.exports = {
-  DROP_SHIP: 'DROP_SHIP',
-  REVERSE: 'REVERSE',
-  FULFILMENT: 'FULFILMENT',
-};

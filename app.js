@@ -36,8 +36,8 @@ app.use('/health', (req, res) => {
 
 app.use(Authenticate);
 app.use(Authorization);
-app.use('/auth', AuthController);
 app.use(requestLimiter);
+app.use('/auth', AuthController);
 app.use('/cache', CacheController);
 app.use('/**', async (req, res, next) => {
   Util.getNotFoundRequest(

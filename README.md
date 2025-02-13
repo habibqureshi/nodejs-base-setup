@@ -4,7 +4,7 @@ This is a base project for nodejs it includes following features
 
 ## Features
 
-- Authentication with JWT
+- Authentication with Oauth 2.0
 - Authorization
 - Rate limiter
 - User / Role / Permission
@@ -75,9 +75,7 @@ Run container in background with env
 
 <img width="1281" alt="image" src="https://github.com/user-attachments/assets/ac098d60-93f7-4e49-9a5b-cc5443f3df2f" />
 
-## Folder structure
 
-<img width="255" alt="image" src="https://github.com/user-attachments/assets/737ac482-39e3-4bc0-81e3-f8e5bffb3f21" />
 
 ## Authors
 
